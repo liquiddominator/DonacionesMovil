@@ -1,5 +1,7 @@
 import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
+import 'package:donaciones_movil/models/rol.dart';
 import 'package:donaciones_movil/models/usuario.dart';
+import 'package:donaciones_movil/services/rol_service.dart';
 import 'package:donaciones_movil/views/campania_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +12,7 @@ class RegisterPage extends StatefulWidget {
   @override
   State<RegisterPage> createState() => _RegisterPageState();
 }
-
+//
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
@@ -18,9 +20,48 @@ class _RegisterPageState extends State<RegisterPage> {
   final _nombreController = TextEditingController();
   final _apellidoController = TextEditingController();
   final _telefonoController = TextEditingController();
-  String _tipoUsuario = 'Donante'; // Valor por defecto
+  
+  final RolService _rolService = RolService();
+  List<Rol> _roles = [];
+  int? _selectedRolId;
+  bool _isLoadingRoles = true;
 
-  final List<String> _tiposUsuario = ['Donante'];
+  @override
+  void initState() {
+    super.initState();
+    _loadRoles();
+  }
+
+  Future<void> _loadRoles() async {
+    try {
+      setState(() {
+        _isLoadingRoles = true;
+      });
+      
+      final roles = await _rolService.getRoles();
+      
+      setState(() {
+        _roles = roles;
+        // Seleccionar el rol "Donante" por defecto si existe
+        final donanteRol = roles.firstWhere(
+          (rol) => rol.nombre == 'Donante',
+          orElse: () => roles.isNotEmpty ? roles.first : Rol(rolId: 0, nombre: 'Error')
+        );
+        _selectedRolId = donanteRol.rolId;
+        _isLoadingRoles = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingRoles = false;
+      });
+      // Mostrar un mensaje de error
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al cargar roles: $e')),
+        );
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -102,24 +143,32 @@ class _RegisterPageState extends State<RegisterPage> {
                     keyboardType: TextInputType.phone,
                   ),
                   const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    value: _tipoUsuario,
-                    decoration: const InputDecoration(
-                      labelText: 'Tipo de Usuario',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: _tiposUsuario.map((String tipo) {
-                      return DropdownMenuItem<String>(
-                        value: tipo,
-                        child: Text(tipo),
-                      );
-                    }).toList(),
-                    onChanged: (String? value) {
-                      setState(() {
-                        _tipoUsuario = value!;
-                      });
-                    },
-                  ),
+                  _isLoadingRoles
+                      ? const Center(child: CircularProgressIndicator())
+                      : DropdownButtonFormField<int>(
+                          value: _selectedRolId,
+                          decoration: const InputDecoration(
+                            labelText: 'Rol de Usuario',
+                            border: OutlineInputBorder(),
+                          ),
+                          items: _roles.map((Rol rol) {
+                            return DropdownMenuItem<int>(
+                              value: rol.rolId,
+                              child: Text(rol.nombre),
+                            );
+                          }).toList(),
+                          onChanged: (int? value) {
+                            setState(() {
+                              _selectedRolId = value;
+                            });
+                          },
+                          validator: (value) {
+                            if (value == null) {
+                              return 'Por favor seleccione un rol';
+                            }
+                            return null;
+                          },
+                        ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _passwordController,
@@ -148,7 +197,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                   ElevatedButton(
-                    onPressed: authController.isLoading
+                    onPressed: authController.isLoading || _isLoadingRoles || _selectedRolId == null
                         ? null
                         : () async {
                             if (_formKey.currentState!.validate()) {
@@ -157,7 +206,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                 usuarioId: 0, // El ID será asignado por la API
                                 email: _emailController.text,
                                 contrasena: _passwordController.text,
-                                tipoUsuario: _tipoUsuario,
                                 nombre: _nombreController.text,
                                 apellido: _apellidoController.text,
                                 telefono: _telefonoController.text.isNotEmpty
@@ -167,7 +215,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                 fechaRegistro: DateTime.now(),
                               );
 
-                              final success = await authController.register(newUsuario);
+                              final success = await authController.register(
+                                newUsuario, 
+                                _selectedRolId!
+                              );
                               
                               if (success && context.mounted) {
                                 Navigator.pushReplacement(

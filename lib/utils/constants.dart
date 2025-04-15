@@ -11,4 +11,6 @@ class ApiConstants {
   static const donacionAsignacionEndpoint = '$apiUrl/DonacionesAsignaciones';
   static const detalleAsignacionEndpoint = '$apiUrl/DetallesAsignacions';
   static const asignacionEndpoint = '$apiUrl/Asignaciones';
+  static const rolesEndpoint = '$apiUrl/Roles';
+  static const usuariosRolesEndpoint = '$apiUrl/UsuariosRoles';
 }

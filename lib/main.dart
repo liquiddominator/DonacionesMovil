@@ -7,8 +7,10 @@ import 'package:donaciones_movil/controllers/donacion_controller.dart';
 import 'package:donaciones_movil/controllers/estado_controller.dart';
 import 'package:donaciones_movil/controllers/mensaje_controller.dart';
 import 'package:donaciones_movil/controllers/respuesta_mensaje_controller.dart';
+import 'package:donaciones_movil/controllers/rol_controller.dart';
 import 'package:donaciones_movil/controllers/saldos_donacion_controller.dart';
 import 'package:donaciones_movil/controllers/user_controller.dart';
+import 'package:donaciones_movil/controllers/usuario_rol_controller.dart';
 import 'package:donaciones_movil/views/auth/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +37,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DonacionAsignacionController()),
         ChangeNotifierProvider(create: (_) => DetalleAsignacionController()),
         ChangeNotifierProvider(create: (_) => AsignacionController()),
+        ChangeNotifierProvider(create: (_) => RolController()),
+        ChangeNotifierProvider(create: (_) => UsuarioRolController()),
       ],
       child: MaterialApp(
         title: 'Donaciones App',
