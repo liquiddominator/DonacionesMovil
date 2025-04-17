@@ -31,7 +31,7 @@ class Usuario {
       fechaRegistro: json['fechaRegistro'] != null 
           ? DateTime.parse(json['fechaRegistro']) 
           : null,
-    );
+    );//
   }
 
   Map<String, dynamic> toJson() {

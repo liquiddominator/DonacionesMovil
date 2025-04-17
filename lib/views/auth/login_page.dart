@@ -1,6 +1,7 @@
 import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
 import 'package:donaciones_movil/views/campania_list_page.dart';
 import 'package:donaciones_movil/views/auth/register_page.dart';
+import 'package:donaciones_movil/views/dashboard_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -90,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const CampaniaListPage(),
+                                    builder: (context) => const DashboardPage(),
                                   ),
                                 );
                               }

@@ -2,7 +2,7 @@ import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
 import 'package:donaciones_movil/models/rol.dart';
 import 'package:donaciones_movil/models/usuario.dart';
 import 'package:donaciones_movil/services/rol_service.dart';
-import 'package:donaciones_movil/views/campania_list_page.dart';
+import 'package:donaciones_movil/views/auth/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -224,7 +224,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const CampaniaListPage(),
+                                    builder: (context) => const LoginPage(),
                                   ),
                                 );
                               }

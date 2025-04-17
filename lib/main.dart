@@ -39,6 +39,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AsignacionController()),
         ChangeNotifierProvider(create: (_) => RolController()),
         ChangeNotifierProvider(create: (_) => UsuarioRolController()),
+        ChangeNotifierProvider(create: (_) => AuthController()),
       ],
       child: MaterialApp(
         title: 'Donaciones App',
