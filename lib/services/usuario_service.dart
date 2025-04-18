@@ -28,12 +28,17 @@ class UsuarioService {
 
   // Actualizar usuario
   Future<Usuario> updateUsuario(Usuario usuario) async {
-    final data = await _apiService.put(
-      '${ApiConstants.userEndpoint}/${usuario.usuarioId}',
-      usuario.toJson(),
-    );
-    return Usuario.fromJson(data);
-  }
+  final response = await _apiService.put(
+    '${ApiConstants.userEndpoint}/${usuario.usuarioId}',
+    usuario.toJson(),
+  );
+
+  // Si no hay cuerpo, retornamos el mismo objeto (ya que fue exitoso)
+  if (response == null) return usuario;
+
+  return Usuario.fromJson(response);
+}
+
 
   // Eliminar usuario
   Future<void> deleteUsuario(int id) async {

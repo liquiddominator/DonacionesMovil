@@ -12,12 +12,19 @@ import 'package:donaciones_movil/controllers/saldos_donacion_controller.dart';
 import 'package:donaciones_movil/controllers/user_controller.dart';
 import 'package:donaciones_movil/controllers/usuario_rol_controller.dart';
 import 'package:donaciones_movil/views/auth/login_page.dart';
+import 'package:donaciones_movil/views/auth/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() {
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('es_BO', null); // Esto resuelve el error
+
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -48,7 +55,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
         ),
-        home: const LoginPage(),
+        home: const SplashPage(nextScreen: LoginPage()),
       ),
     );
   }

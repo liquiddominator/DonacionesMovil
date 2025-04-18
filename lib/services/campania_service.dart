@@ -28,12 +28,19 @@ class CampaniaService {
 
   // Actualizar campaña
   Future<Campania> updateCampania(Campania campania) async {
-    final data = await _apiService.put(
-      '${ApiConstants.campaniaEndpoint}/${campania.campaniaId}',
-      campania.toJson(),
-    );
-    return Campania.fromJson(data);
+  final data = await _apiService.put(
+    '${ApiConstants.campaniaEndpoint}/${campania.campaniaId}',
+    campania.toJson(),
+  );
+
+  // Si el backend devuelve 204 o sin body, data será null
+  if (data == null) {
+    return campania; // asumimos que se actualizó correctamente
+  } else {
+    return Campania.fromJson(data); // si devuelve un body, lo usamos
   }
+}
+
 
   // Eliminar campaña
   Future<void> deleteCampania(int id) async {

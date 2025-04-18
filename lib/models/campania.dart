@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class Campania {
   final int campaniaId;
   final String titulo;
@@ -43,17 +45,19 @@ class Campania {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'campaniaId': campaniaId,
-      'titulo': titulo,
-      'descripcion': descripcion,
-      'fechaInicio': fechaInicio.toIso8601String(),
-      'fechaFin': fechaFin?.toIso8601String(),
-      'metaRecaudacion': metaRecaudacion,
-      'montoRecaudado': montoRecaudado,
-      'usuarioIdcreador': usuarioIdcreador,
-      'activa': activa,
-      'fechaCreacion': fechaCreacion?.toIso8601String(),
-    };
-  }
+  final dateOnly = DateFormat('yyyy-MM-dd');
+
+  return {
+    'campaniaId': campaniaId,
+    'titulo': titulo,
+    'descripcion': descripcion,
+    'fechaInicio': dateOnly.format(fechaInicio),
+    'fechaFin': fechaFin != null ? dateOnly.format(fechaFin!) : null,
+    'metaRecaudacion': metaRecaudacion,
+    'montoRecaudado': montoRecaudado,
+    'usuarioIdcreador': usuarioIdcreador,
+    'activa': activa,
+    'fechaCreacion': fechaCreacion?.toIso8601String(),
+  };
+}
 }

@@ -59,19 +59,22 @@ class AsignacionController extends ChangeNotifier {
   }
 
   // Obtener asignaciones por usuario
-  Future<List<Asignacion>> fetchAsignacionesByUsuario(int usuarioId) async {
-    _setLoading(true);
-    try {
-      final asignacionesUsuario = await _asignacionService.getAsignacionesByUsuario(usuarioId);
-      _errorMessage = '';
-      return asignacionesUsuario;
-    } catch (e) {
-      _errorMessage = 'Error al cargar asignaciones del usuario: ${e.toString()}';
-      return [];
-    } finally {
-      _setLoading(false);
-    }
+Future<List<Asignacion>> fetchAsignacionesByUsuario(int usuarioId) async {
+  _setLoading(true);
+  try {
+    final asignacionesUsuario = await _asignacionService.getAsignacionesByUsuario(usuarioId);
+    _asignaciones = asignacionesUsuario; // <-- esto actualiza la lista interna
+    _errorMessage = '';
+    notifyListeners(); // <-- esto permite que la UI se reconstruya
+    return asignacionesUsuario;
+  } catch (e) {
+    _errorMessage = 'Error al cargar asignaciones del usuario: ${e.toString()}';
+    return [];
+  } finally {
+    _setLoading(false);
   }
+}
+
 
   // Crear asignación
   Future<bool> createAsignacion(Asignacion asignacion) async {

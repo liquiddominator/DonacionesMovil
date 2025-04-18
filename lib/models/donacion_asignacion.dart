@@ -2,7 +2,7 @@ class DonacionAsignacion {
   final int donacionAsignacionId;
   final int donacionId;
   final int asignacionId;
-  final double montoAsignado;
+  double montoAsignado;
   final DateTime? fechaAsignacion;
 
   DonacionAsignacion({

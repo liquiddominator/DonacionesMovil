@@ -47,6 +47,10 @@ class UserController extends ChangeNotifier {
     }
   }
 
+  Future<Usuario> getUsuarioById(int id) async {
+    return await _usuarioService.getUsuarioById(id);
+  }
+
   // Crear usuario
   Future<bool> createUsuario(Usuario usuario) async {
     _isLoading = true;
@@ -71,4 +75,37 @@ class UserController extends ChangeNotifier {
       return false;
     }
   }
+
+  // Actualizar usuario existente
+Future<bool> updateUsuario(Usuario usuario) async {
+  _isLoading = true;
+  _error = null;
+  notifyListeners();
+
+  try {
+    final updated = await _usuarioService.updateUsuario(usuario);
+
+    // Reemplazar en la lista si existe
+    final index = _usuarios?.indexWhere((u) => u.usuarioId == usuario.usuarioId) ?? -1;
+    if (index != -1 && _usuarios != null) {
+      _usuarios![index] = updated;
+    }
+
+    // Actualizar usuario seleccionado
+    if (_selectedUsuario?.usuarioId == usuario.usuarioId) {
+      _selectedUsuario = updated;
+    }
+
+    notifyListeners();
+    return true;
+  } catch (e) {
+    _error = 'Error al actualizar usuario: ${e.toString()}';
+    notifyListeners();
+    return false;
+  } finally {
+    _isLoading = false;
+    notifyListeners();
+  }
+}
+
 }

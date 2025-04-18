@@ -115,6 +115,12 @@ class AuthController extends ChangeNotifier {
     return _userRoles?.any((rol) => rol.nombre == rolName) ?? false;
   }
 
+  void setCurrentUser(Usuario usuario) {
+    _currentUser = usuario;
+    notifyListeners();
+  }
+
+
   // Logout
   void logout() {
     _currentUser = null;

@@ -45,6 +45,21 @@ class UsuarioRolController extends ChangeNotifier {
     }
   }
 
+  Future<void> loadUsuariosByRolId(int rolId) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _usuariosRoles = await _service.getUsuariosByRolId(rolId);
+    } catch (e) {
+      _error = 'Error al cargar usuarios por rol: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<bool> asignarRolAUsuario(UsuarioRol usuarioRol) async {
     _isLoading = true;
     _error = null;
