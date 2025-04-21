@@ -1,6 +1,7 @@
 import 'package:donaciones_movil/controllers/asignacion_controller.dart';
 import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
 import 'package:donaciones_movil/controllers/campania_controller.dart';
+import 'package:donaciones_movil/controllers/comentario_controller.dart';
 import 'package:donaciones_movil/controllers/detalle_asignacion_controller.dart';
 import 'package:donaciones_movil/controllers/donacion_asignacion_controller.dart';
 import 'package:donaciones_movil/controllers/donacion_controller.dart';
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => RolController()),
         ChangeNotifierProvider(create: (_) => UsuarioRolController()),
         ChangeNotifierProvider(create: (_) => AuthController()),
+        ChangeNotifierProvider(create: (_) => ComentarioController()),
       ],
       child: MaterialApp(
         title: 'Donaciones App',

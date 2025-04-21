@@ -1,5 +1,6 @@
 import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
 import 'package:donaciones_movil/controllers/user_controller.dart';
+import 'package:donaciones_movil/views/perfil/feedback_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:donaciones_movil/models/usuario.dart';
@@ -12,7 +13,7 @@ class PerfilUsuarioPage extends StatefulWidget {
 }
 
 class _PerfilUsuarioPageState extends State<PerfilUsuarioPage> {
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();//
 
   late TextEditingController _nombreController;
   late TextEditingController _apellidoController;
@@ -99,39 +100,75 @@ class _PerfilUsuarioPageState extends State<PerfilUsuarioPage> {
         child: Form(
           key: _formKey,
           child: ListView(
-            children: [
-              TextFormField(
-                controller: _nombreController,
-                decoration: const InputDecoration(labelText: 'Nombre'),
-                enabled: _editMode,
-                validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
-              ),
-              TextFormField(
-                controller: _apellidoController,
-                decoration: const InputDecoration(labelText: 'Apellido'),
-                enabled: _editMode,
-                validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
-              ),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Correo electrónico'),
-                enabled: _editMode,
-                validator: (value) => value!.contains('@') ? null : 'Correo inválido',
-              ),
-              TextFormField(
-                controller: _telefonoController,
-                decoration: const InputDecoration(labelText: 'Teléfono'),
-                enabled: _editMode,
-              ),
-              const SizedBox(height: 24),
-              if (_editMode)
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.save),
-                  label: const Text('Guardar cambios'),
-                  onPressed: () => _guardarCambios(user),
-                ),
-            ],
-          ),
+  children: [
+    TextFormField(
+      controller: _nombreController,
+      decoration: const InputDecoration(labelText: 'Nombre'),
+      enabled: _editMode,
+      validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
+    ),
+    TextFormField(
+      controller: _apellidoController,
+      decoration: const InputDecoration(labelText: 'Apellido'),
+      enabled: _editMode,
+      validator: (value) => value!.isEmpty ? 'Campo requerido' : null,
+    ),
+    TextFormField(
+      controller: _emailController,
+      decoration: const InputDecoration(labelText: 'Correo electrónico'),
+      enabled: _editMode,
+      validator: (value) => value!.contains('@') ? null : 'Correo inválido',
+    ),
+    TextFormField(
+      controller: _telefonoController,
+      decoration: const InputDecoration(labelText: 'Teléfono'),
+      enabled: _editMode,
+    ),
+    const SizedBox(height: 24),
+    if (_editMode)
+      ElevatedButton.icon(
+        icon: const Icon(Icons.save),
+        label: const Text('Guardar cambios'),
+        onPressed: () => _guardarCambios(user),
+      ),
+    const SizedBox(height: 32),
+    const Divider(),
+    const Text(
+      'Opciones',
+      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    ),
+    const SizedBox(height: 8),
+    ListTile(
+      leading: const Icon(Icons.feedback_outlined),
+      title: const Text('Feedback / Opinión'),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const FeedbackPage()),
+        );
+      },
+    ),
+    ListTile(
+      leading: const Icon(Icons.lock_outline),
+      title: const Text('Cambiar contraseña'),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      onTap: () {
+        // Aquí puedes conectar tu pantalla de cambio de contraseña
+      },
+    ),
+    ListTile(
+      leading: const Icon(Icons.logout),
+      title: const Text('Cerrar sesión'),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      onTap: () {
+        Provider.of<AuthController>(context, listen: false).logout();
+        Navigator.pop(context); // o navegar a pantalla de login
+      },
+    ),
+  ],
+),
+
         ),
       ),
     );
