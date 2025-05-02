@@ -1,5 +1,4 @@
 import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
-import 'package:donaciones_movil/controllers/donacion_controller.dart';
 import 'package:donaciones_movil/models/campania.dart';
 import 'package:donaciones_movil/models/donacion.dart';
 import 'package:donaciones_movil/views/campanias/confirmar_donacion_page.dart';

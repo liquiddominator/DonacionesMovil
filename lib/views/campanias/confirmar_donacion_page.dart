@@ -2,6 +2,7 @@ import 'package:donaciones_movil/controllers/campania_controller.dart';
 import 'package:donaciones_movil/controllers/donacion_controller.dart';
 import 'package:donaciones_movil/models/campania.dart';
 import 'package:donaciones_movil/models/donacion.dart';
+import 'package:donaciones_movil/widgets/donaciones/feedback_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -47,51 +48,51 @@ class ConfirmarDonacionPage extends StatelessWidget {
             Center(
               child: ElevatedButton.icon(
                 onPressed: () async {
-  final donacionController = context.read<DonacionController>();
-  final campaniaController = context.read<CampaniaController>();
+                  final donacionController = context.read<DonacionController>();
+                  final campaniaController = context.read<CampaniaController>();
 
-  final success = await donacionController.createDonacion(donacion);
+                  final success = await donacionController.createDonacion(donacion);
 
-  if (success) {
-    // Solo si es monetaria, actualiza el fondo recaudado de la campaña
-    if (donacion.tipoDonacion == 'Monetaria') {
-      final nuevaCampania = Campania(
-  campaniaId: campania.campaniaId,
-  titulo: campania.titulo,
-  descripcion: campania.descripcion,
-  fechaInicio: DateTime.parse(DateFormat('yyyy-MM-dd').format(campania.fechaInicio)),
-  fechaFin: campania.fechaFin != null
-      ? DateTime.parse(DateFormat('yyyy-MM-dd').format(campania.fechaFin!))
-      : null,
-  metaRecaudacion: campania.metaRecaudacion,
-  montoRecaudado: (campania.montoRecaudado ?? 0) + donacion.monto,
-  usuarioIdcreador: campania.usuarioIdcreador,
-  activa: campania.activa ?? true,
-  fechaCreacion: campania.fechaCreacion ?? DateTime.now(),
-);
+                  if (success) {
+                    if (donacion.tipoDonacion == 'Monetaria') {
+                      final nuevaCampania = Campania(
+                        campaniaId: campania.campaniaId,
+                        titulo: campania.titulo,
+                        descripcion: campania.descripcion,
+                        fechaInicio: DateTime.parse(DateFormat('yyyy-MM-dd').format(campania.fechaInicio)),
+                        fechaFin: campania.fechaFin != null
+                            ? DateTime.parse(DateFormat('yyyy-MM-dd').format(campania.fechaFin!))
+                            : null,
+                        metaRecaudacion: campania.metaRecaudacion,
+                        montoRecaudado: (campania.montoRecaudado ?? 0) + donacion.monto,
+                        usuarioIdcreador: campania.usuarioIdcreador,
+                        activa: campania.activa ?? true,
+                        fechaCreacion: campania.fechaCreacion ?? DateTime.now(),
+                      );
 
+                      await campaniaController.updateCampania(nuevaCampania);
+                    }
 
+                    if (context.mounted) {
+                      await showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (_) => FeedbackDialog(donacion: donacion),
+                      );
+                    }
 
-      await campaniaController.updateCampania(nuevaCampania);
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Donación confirmada con éxito'),
-        backgroundColor: Colors.green,
-      ),
-    );
-    Navigator.popUntil(context, (route) => route.isFirst);
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Error: ${donacionController.error}'),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-},
-
+                    if (context.mounted) {
+                      Navigator.popUntil(context, (route) => route.isFirst);
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error: ${donacionController.error}'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
                 icon: const Icon(Icons.check),
                 label: const Text('Confirmar Donación'),
                 style: ElevatedButton.styleFrom(

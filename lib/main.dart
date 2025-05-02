@@ -18,11 +18,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('es_BO', null); // Esto resuelve el error
-
+  await initializeDateFormatting('es_BO', null);
   runApp(const MyApp());
 }
 

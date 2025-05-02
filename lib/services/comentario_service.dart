@@ -49,4 +49,9 @@ class ComentarioService {
   Future<void> deleteComentario(String id) async {
     await _apiService.delete('${ApiConstants.comentarioEndpoint}/$id');
   }
+
+  Future<List<Comentario>> getComentariosByDonacion(int donacionId) async {
+    final data = await _apiService.get('${ApiConstants.comentarioEndpoint}/donacion/$donacionId');
+    return (data as List).map((e) => Comentario.fromJson(e)).toList();
+  }
 }

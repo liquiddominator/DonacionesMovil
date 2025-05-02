@@ -1,9 +1,10 @@
-import 'package:donaciones_movil/controllers/asignacion_controller.dart';
 import 'package:donaciones_movil/controllers/campania_controller.dart';
 import 'package:donaciones_movil/controllers/donacion_controller.dart';
 import 'package:donaciones_movil/controllers/saldos_donacion_controller.dart';
+import 'package:donaciones_movil/models/donacion.dart';
 import 'package:donaciones_movil/views/auth/login_page.dart';
 import 'package:donaciones_movil/widgets/dashboard/build_campanias_lista.dart';
+import 'package:donaciones_movil/controllers/asignacion_controller.dart';
 import 'package:donaciones_movil/widgets/dashboard/build_sumary_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -11,11 +12,14 @@ import 'package:provider/provider.dart';
 import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
 
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({Key? key}) : super(key: key);
+  final Donacion? donacionReciente;
+
+  const DashboardPage({Key? key, this.donacionReciente}) : super(key: key);
 
   @override
   _DashboardPageState createState() => _DashboardPageState();
 }
+
 
 class _DashboardPageState extends State<DashboardPage> {
   final currencyFormat = NumberFormat.currency(
@@ -37,64 +41,64 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void _loadInitialData() {
+  final authController = context.read<AuthController>();
+  final campaniaController = context.read<CampaniaController>();
+  final donacionController = context.read<DonacionController>();
+  final saldosController = context.read<SaldosDonacionController>();
+  final asignacionController = context.read<AsignacionController>();
+
+  // Campañas activas
+  campaniaController.loadCampaniasActivas();
+
+  // Datos globales
+  donacionController.loadDonaciones();
+  asignacionController.fetchAsignaciones();
+
+  // Datos por usuario
+  if (authController.isAuthenticated) {
+    final userId = authController.currentUser!.usuarioId;
+    donacionController.loadDonacionesByUsuario(userId);
+    saldosController.loadSaldos();
+  }
+}
+
+  Future<void> _refreshData() async {
+  setState(() {
+    _isRefreshing = true;
+  });
+
+  try {
     final authController = context.read<AuthController>();
     final campaniaController = context.read<CampaniaController>();
     final donacionController = context.read<DonacionController>();
     final saldosController = context.read<SaldosDonacionController>();
     final asignacionController = context.read<AsignacionController>();
 
-    campaniaController.loadCampaniasActivas();
-    
+    await campaniaController.loadCampaniasActivas();
+    await donacionController.loadDonaciones();
+    await asignacionController.fetchAsignaciones();
+
     if (authController.isAuthenticated) {
       final userId = authController.currentUser!.usuarioId;
-      donacionController.loadDonacionesByUsuario(userId);
-      saldosController.loadSaldos();
-      asignacionController.fetchAsignacionesByUsuario(userId);
+      await donacionController.loadDonacionesByUsuario(userId);
+      await saldosController.loadSaldos();
     }
-  }
 
-  Future<void> _refreshData() async {
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error al actualizar datos: $e'),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  } finally {
     setState(() {
-      _isRefreshing = true;
+      _isRefreshing = false;
     });
-    
-    try {
-      final authController = context.read<AuthController>();
-      final campaniaController = context.read<CampaniaController>();
-      final donacionController = context.read<DonacionController>();
-      final saldosController = context.read<SaldosDonacionController>();
-      final asignacionController = context.read<AsignacionController>();
-
-      await campaniaController.loadCampaniasActivas();
-      
-      if (authController.isAuthenticated) {
-        final userId = authController.currentUser!.usuarioId;
-        await donacionController.loadDonacionesByUsuario(userId);
-        await saldosController.loadSaldos();
-        await asignacionController.fetchAsignacionesByUsuario(userId);
-      }
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Datos actualizados correctamente'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al actualizar datos: $e'),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    } finally {
-      setState(() {
-        _isRefreshing = false;
-      });
-    }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -206,35 +210,33 @@ class _DashboardPageState extends State<DashboardPage> {
                   },
                 ),
                 PopupMenuButton<String>(
-  icon: const Icon(Icons.more_vert, color: Colors.white),
-  onSelected: (value) {
-    if (value == 'logout') {
-      context.read<AuthController>().logout();
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const LoginPage()),
-        (route) => false, // Elimina todo el historial de navegación
-      );
-    }
-  },
-  itemBuilder: (context) => [
-    const PopupMenuItem(
-      value: 'logout',
-      child: Text('Cerrar sesión'),
-    ),
-  ],
-)
-
+                  icon: const Icon(Icons.more_vert, color: Colors.white),
+                  onSelected: (value) {
+                    if (value == 'logout') {
+                      context.read<AuthController>().logout();
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const LoginPage()),
+                        (route) => false,
+                      );
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'logout',
+                      child: Text('Cerrar sesión'),
+                    ),
+                  ],
+                )
               ],
             ),
-            
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     buildSummaryCards(context, currencyFormat),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 15),
                     
                     const Text(
                       'Campañas Destacadas',

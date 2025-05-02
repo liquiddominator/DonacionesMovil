@@ -84,13 +84,13 @@ class ComentarioController extends ChangeNotifier {
 
 if (nuevo.id != null) {
   _comentarios ??= [];
-  _comentarios!.add(nuevo); // usamos el objeto que viene con ID desde Mongo
+  _comentarios!.add(nuevo);
 } else {
   print('⚠️ Comentario creado sin ID, no se puede agregar a la lista.');
 }
 
 
-    await loadPromedioCalificacion(); // actualizar promedio
+    await loadPromedioCalificacion();
     notifyListeners();
     return true;
   } catch (e) {
@@ -121,19 +121,28 @@ if (nuevo.id != null) {
   }
 
   Future<bool> deleteComentario(String id) async {
-  _setLoading(true);
-  try {
-    await _service.deleteComentario(id);
-    _comentarios?.removeWhere((c) => c.id == id);
-    await loadPromedioCalificacion(); // actualizar promedio
-    notifyListeners();
-    return true;
-  } catch (e) {
-    _setError(e.toString());
-    return false;
-  } finally {
+    _setLoading(true);
+    try {
+      await _service.deleteComentario(id);
+      _comentarios?.removeWhere((c) => c.id == id);
+      await loadPromedioCalificacion();
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _setError(e.toString());
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> loadComentariosByDonacion(int donacionId) async {
+    _setLoading(true);
+    try {
+      _comentarios = await _service.getComentariosByDonacion(donacionId);
+    } catch (e) {
+      _setError(e.toString());
+    }
     _setLoading(false);
   }
-}
-
 }

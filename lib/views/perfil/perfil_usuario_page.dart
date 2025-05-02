@@ -1,7 +1,6 @@
 import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
 import 'package:donaciones_movil/controllers/user_controller.dart';
 import 'package:donaciones_movil/views/auth/login_page.dart';
-import 'package:donaciones_movil/views/perfil/feedback_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:donaciones_movil/models/usuario.dart';
@@ -327,16 +326,6 @@ Widget build(BuildContext context) {
                       ),
                       child: Column(
                         children: [
-                          _buildOptionTile(
-                            icon: Icons.feedback_outlined,
-                            title: 'Feedback / Opinión',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const FeedbackPage()),
-                              );
-                            },
-                          ),
                           Divider(height: 1, color: Colors.grey.withOpacity(0.2)),
                           _buildOptionTile(
                             icon: Icons.lock_outline,

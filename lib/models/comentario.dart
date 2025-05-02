@@ -6,6 +6,7 @@ class Comentario {
   final String texto;
   final int calificacion;
   final DateTime fechaCreacion;
+  final int? donacionId;
 
   Comentario({
     this.id,
@@ -15,6 +16,7 @@ class Comentario {
     required this.texto,
     required this.calificacion,
     required this.fechaCreacion,
+    this.donacionId,
   });
 
   factory Comentario.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class Comentario {
       texto: json['texto'],
       calificacion: json['calificacion'],
       fechaCreacion: DateTime.parse(json['fechaCreacion']),
+      donacionId: json['donacionId'],
     );
   }
 
@@ -38,6 +41,7 @@ class Comentario {
       'texto': texto,
       'calificacion': calificacion,
       'fechaCreacion': fechaCreacion.toIso8601String(),
+      'donacionId': donacionId,
     };
   }
 }

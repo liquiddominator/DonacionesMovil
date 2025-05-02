@@ -84,7 +84,6 @@ class _DetalleDonacionPageState extends State<DetalleDonacionPage> {
   });
 }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
