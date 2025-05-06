@@ -11,7 +11,6 @@ import 'package:donaciones_movil/widgets/donaciones/detalle_donacion_row.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 
@@ -61,22 +60,21 @@ class _DetalleDonacionPageState extends State<DetalleDonacionPage> {
     final double totalUsado = detalles.fold(0, (sum, d) => sum + (d.cantidad * d.precioUnitario));
 
     // Actualiza el campo montoAsignado en DonacionAsignacion
-    da.montoAsignado = totalUsado;
-    await daController.updateDonacionAsignacion(da);
+    final asignacion = asignacionController.selectedAsignacion;
+if (asignacion == null) return;
 
-    // Actualiza el campo monto en la asignación misma
-    final asignacion = asignacionController.asignaciones
-        .firstWhere((a) => a.asignacionId == da.asignacionId);
-    final asignacionActualizada = Asignacion(
-      asignacionId: asignacion.asignacionId,
-      campaniaId: asignacion.campaniaId,
-      descripcion: asignacion.descripcion,
-      monto: totalUsado,
-      fechaAsignacion: asignacion.fechaAsignacion,
-      usuarioId: asignacion.usuarioId,
-      comprobante: asignacion.comprobante,
-    );
-    await asignacionController.updateAsignacion(asignacionActualizada);
+final asignacionActualizada = Asignacion(
+  asignacionId: asignacion.asignacionId,
+  campaniaId: asignacion.campaniaId,
+  descripcion: asignacion.descripcion,
+  monto: totalUsado,
+  fechaAsignacion: asignacion.fechaAsignacion,
+  usuarioId: asignacion.usuarioId,
+  comprobante: asignacion.comprobante,
+);
+
+await asignacionController.updateAsignacion(asignacionActualizada);
+
   }
 
   setState(() {

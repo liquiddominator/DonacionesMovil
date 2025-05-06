@@ -1,9 +1,9 @@
-import 'package:donaciones_movil/controllers/asignacion_controller.dart';
 import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
 import 'package:donaciones_movil/controllers/user_controller.dart';
-import 'package:donaciones_movil/models/asignacion.dart';
+import 'package:donaciones_movil/controllers/donacion_controller.dart';
 import 'package:donaciones_movil/models/campania.dart';
 import 'package:donaciones_movil/models/usuario.dart';
+import 'package:donaciones_movil/models/donacion.dart';
 import 'package:donaciones_movil/views/campanias/donacion_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -20,32 +20,30 @@ class DetalleCampaniaPage extends StatefulWidget {
 }
 
 class _DetalleCampaniaPageState extends State<DetalleCampaniaPage> {
-  List<Asignacion> _asignacionesUsuarioCampania = [];
-  bool _cargandoHistorial = true;
+  List<Donacion> _ultimasDonaciones = [];
+  bool _cargandoDonaciones = true;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _cargarAsignacionesDelUsuario();
+      _cargarUltimasDonaciones();
     });
   }
 
-  Future<void> _cargarAsignacionesDelUsuario() async {
-    final authController = Provider.of<AuthController>(context, listen: false);
-    final asignacionController = Provider.of<AsignacionController>(context, listen: false);
+  Future<void> _cargarUltimasDonaciones() async {
+    final donacionController = Provider.of<DonacionController>(context, listen: false);
+    await donacionController.loadDonacionesByCampania(widget.campania.campaniaId);
 
-    final usuarioId = authController.currentUser?.usuarioId;
+    final todas = donacionController.donaciones ?? [];
 
-    if (usuarioId != null) {
-      final asignaciones = await asignacionController.fetchAsignacionesByUsuario(usuarioId);
-      setState(() {
-        _asignacionesUsuarioCampania = asignaciones
-            .where((a) => a.campaniaId == widget.campania.campaniaId)
-            .toList();
-        _cargandoHistorial = false;
-      });
-    }
+    todas.sort((a, b) => (b.fechaDonacion ?? DateTime.now())
+        .compareTo(a.fechaDonacion ?? DateTime.now()));
+
+    setState(() {
+      _ultimasDonaciones = todas.take(2).toList();
+      _cargandoDonaciones = false;
+    });
   }
 
   @override
@@ -98,30 +96,47 @@ class _DetalleCampaniaPageState extends State<DetalleCampaniaPage> {
                 ),
               ),
             const SizedBox(height: 16),
-            const Text(
-              'Historial de asignaciones realizadas (transparencia)',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            _cargandoHistorial
-                ? const Center(child: CircularProgressIndicator())
-                : _asignacionesUsuarioCampania.isEmpty
-                    ? const Text('No hay asignaciones realizadas por ti en esta campaña.')
-                    : Expanded(
-                        child: ListView.builder(
-                          itemCount: _asignacionesUsuarioCampania.length,
-                          itemBuilder: (context, index) {
-                            final asignacion = _asignacionesUsuarioCampania[index];
-                            return ListTile(
-                              title: Text(asignacion.descripcion),
-                              subtitle: Text(
-                                'Monto: ${currencyFormat.format(asignacion.monto)}\nFecha: ${DateFormat.yMMMd().format(asignacion.fechaAsignacion ?? DateTime.now())}',
-                              ),
-                              leading: const Icon(Icons.receipt),
-                              isThreeLine: true,
-                            );
-                          },
-                        ),
-                      ),
+const Text(
+  'Últimas donaciones realizadas a esta campaña',
+  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+),
+_cargandoDonaciones
+    ? const Center(child: CircularProgressIndicator())
+    : _ultimasDonaciones.isEmpty
+        ? const Text('Aún no hay donaciones registradas.')
+        : Column(
+            children: _ultimasDonaciones.map((donacion) {
+              final usuario = userController.usuarios?.firstWhere(
+                (u) => u.usuarioId == donacion.usuarioId,
+                orElse: () => Usuario(
+                  usuarioId: 0,
+                  email: 'Desconocido',
+                  contrasena: '',
+                  nombre: '',
+                  apellido: '',
+                ),
+              );
+
+              return ListTile(
+                leading: const Icon(Icons.attach_money),
+                title: Text('Monto: ${currencyFormat.format(donacion.monto)}'),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Fecha: ${DateFormat.yMMMd().format(donacion.fechaDonacion ?? DateTime.now())}'),
+                    Text(
+                      donacion.esAnonima == true
+                          ? '(Donante anónimo)'
+                          : 'Donante: ${usuario?.email ?? 'Desconocido'}',
+                      style: const TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                  ],
+                ),
+                isThreeLine: true,
+              );
+            }).toList(),
+          ),
+
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
