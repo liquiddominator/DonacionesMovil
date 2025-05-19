@@ -2,11 +2,11 @@ import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
 import 'package:donaciones_movil/controllers/donacion_controller.dart';
 import 'package:donaciones_movil/controllers/saldos_donacion_controller.dart';
 import 'package:donaciones_movil/controllers/asignacion_controller.dart';
+import 'package:donaciones_movil/utils/currency_format.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 
-Widget buildSummaryCards(BuildContext context, NumberFormat currencyFormat) {
+Widget buildSummaryCards(BuildContext context) {
   final donacionController = context.watch<DonacionController>();
   final saldosController = context.watch<SaldosDonacionController>();
   final asignacionController = context.watch<AsignacionController>();
@@ -43,7 +43,7 @@ Widget buildSummaryCards(BuildContext context, NumberFormat currencyFormat) {
               context,
               icon: Icons.account_balance_wallet,
               title: 'Total Donado',
-              value: currencyFormat.format(totalDonado),
+              value: currencyFormatter.format(totalDonado),
               color: Colors.green,
             ),
           ),
@@ -53,7 +53,7 @@ Widget buildSummaryCards(BuildContext context, NumberFormat currencyFormat) {
               context,
               icon: Icons.payments,
               title: 'Fondos Utilizados',
-              value: currencyFormat.format(totalUtilizado),
+              value: currencyFormatter.format(totalUtilizado),
               color: Colors.purple,
             ),
           ),

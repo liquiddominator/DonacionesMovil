@@ -5,6 +5,7 @@ import 'package:donaciones_movil/controllers/saldos_donacion_controller.dart';
 import 'package:donaciones_movil/models/asignacion.dart';
 import 'package:donaciones_movil/models/campania.dart';
 import 'package:donaciones_movil/models/donacion.dart';
+import 'package:donaciones_movil/utils/currency_format.dart';
 import 'package:donaciones_movil/widgets/donaciones/build_saldo_info.dart';
 import 'package:donaciones_movil/widgets/donaciones/detalle_donacion_asignaciones.dart';
 import 'package:donaciones_movil/widgets/donaciones/detalle_donacion_row.dart';
@@ -31,7 +32,6 @@ class DetalleDonacionPage extends StatefulWidget {
 }
 
 class _DetalleDonacionPageState extends State<DetalleDonacionPage> {
-  final NumberFormat currencyFormat = NumberFormat.currency(locale: 'es_BO', symbol: 'Bs');
   bool _loadingSeguimiento = true;
 
   @override
@@ -106,7 +106,7 @@ await asignacionController.updateAsignacion(asignacionActualizada);
                           const SizedBox(height: 12),
                           buildDetailRow('Campaña:', widget.campania.titulo),
                           buildDetailRow('Estado:', widget.nombreEstado),
-                          buildDetailRow('Monto:', currencyFormat.format(widget.donacion.monto)),
+                          buildDetailRow('Monto:', currencyFormatter.format(widget.donacion.monto)),
                           buildDetailRow('Tipo:', widget.donacion.tipoDonacion),
                           if (widget.donacion.descripcion?.isNotEmpty == true)
                             buildDetailRow('Descripción:', widget.donacion.descripcion!),
@@ -117,8 +117,8 @@ await asignacionController.updateAsignacion(asignacionActualizada);
                           const Text('Detalles de la campaña', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 12),
                           buildDetailRow('Descripción:', widget.campania.descripcion),
-                          buildDetailRow('Meta:', currencyFormat.format(widget.campania.metaRecaudacion)),
-                          buildDetailRow('Recaudado:', currencyFormat.format(widget.campania.montoRecaudado ?? 0)),
+                          buildDetailRow('Meta:', currencyFormatter.format(widget.campania.metaRecaudacion)),
+                          buildDetailRow('Recaudado:', currencyFormatter.format(widget.campania.montoRecaudado ?? 0)),
                           buildDetailRow('Inicio:', DateFormat.yMMMd().format(widget.campania.fechaInicio)),
                           if (widget.campania.fechaFin != null)
                             buildDetailRow('Fin:', DateFormat.yMMMd().format(widget.campania.fechaFin!)),
@@ -131,11 +131,10 @@ await asignacionController.updateAsignacion(asignacionActualizada);
                             context: context,
                             donacionId: widget.donacion.donacionId,
                             montoOriginal: widget.donacion.monto,
-                            currencyFormat: currencyFormat,
                             buildDetailRow: buildDetailRow,
                           ),
                           const SizedBox(height: 12),
-                          ...buildAsignacionesInfo(context: context, currencyFormat: currencyFormat),
+                          ...buildAsignacionesInfo(context: context),
                           const SizedBox(height: 20),
                           ElevatedButton.icon(
                             icon: const Icon(Icons.picture_as_pdf),

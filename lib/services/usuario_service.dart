@@ -1,3 +1,4 @@
+import 'package:bcrypt/bcrypt.dart';
 import 'package:donaciones_movil/models/usuario.dart';
 import 'package:donaciones_movil/services/api/api_service.dart';
 import 'package:donaciones_movil/utils/constants.dart';
@@ -47,14 +48,15 @@ class UsuarioService {
 
   // Login (autenticación simple)
   Future<Usuario?> login(String email, String password) async {
-    try {
-      // Obtener todos los usuarios y filtrar por email/contraseña
-      final usuarios = await getUsuarios();
-      return usuarios.firstWhere(
-        (u) => u.email == email && u.contrasena == password,
-      );
-    } catch (e) {
-      return null;
-    }
+  try {
+    final usuarios = await getUsuarios();
+    final usuario = usuarios.firstWhere((u) => u.email == email, orElse: () => throw Exception("Usuario no encontrado"));
+    
+    final isValid = BCrypt.checkpw(password, usuario.contrasena);
+    return isValid ? usuario : null;
+  } catch (e) {
+    return null;
   }
+}
+
 }

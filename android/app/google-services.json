@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "481032608281",
+    "project_id": "transparenciadonaciones",
+    "storage_bucket": "transparenciadonaciones.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:481032608281:android:a9da36c9427043d3256888",
+        "android_client_info": {
+          "package_name": "com.example.donaciones_movil"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "481032608281-sukr2oeoeeg2us7adut2eagbr5jqlh5o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.donaciones_movil",
+            "certificate_hash": "322fd95d50c0ee4dddd1e5b06a48b74fa432b8f3"
+          }
+        },
+        {
+          "client_id": "481032608281-79l61orifkdj7n9i26gl96d3nemj7ifc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_pqvD0sRqqGUVMCy-wECKXq1TQwgLSKc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "481032608281-79l61orifkdj7n9i26gl96d3nemj7ifc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

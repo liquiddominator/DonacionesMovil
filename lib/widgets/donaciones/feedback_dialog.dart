@@ -89,17 +89,21 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
 
                         final success = await comentarioController.createComentario(comentario);
 
-                        setState(() => _isSubmitting = false);
+if (!mounted) return; // ⬅️ importante
 
-                        if (success && context.mounted) {
-                          setState(() => _showGracias = true);
+setState(() => _isSubmitting = false);
 
-                          await Future.delayed(const Duration(seconds: 3));
+if (success) {
+  if (!mounted) return; // ⬅️ importante
+  setState(() => _showGracias = true);
 
-                          if (context.mounted) {
-                            Navigator.pop(context); // cerrar el diálogo solamente
-                          }
-                        }
+  await Future.delayed(const Duration(seconds: 3));
+
+  if (mounted) {
+    Navigator.pop(context);
+  }
+}
+
                       },
                 child: const Text('Enviar'),
               ),

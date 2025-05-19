@@ -1,14 +1,13 @@
 import 'package:donaciones_movil/models/campania.dart';
 import 'package:donaciones_movil/models/usuario.dart';
+import 'package:donaciones_movil/utils/currency_format.dart';
 import 'package:donaciones_movil/views/campanias/detalle_campania_page.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:percent_indicator/flutter_percent_indicator.dart';
 
 Widget buildCampaniaCard(
   BuildContext context,
   Campania campania,
-  NumberFormat currencyFormat,
   Map<int, Usuario> usuariosMap, {
   Color? cardColor,
   Color? primaryColor,
@@ -195,7 +194,7 @@ Widget buildCampaniaCard(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          currencyFormat.format(campania.montoRecaudado ?? 0),
+                          currencyFormatter.format(campania.montoRecaudado ?? 0),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -203,7 +202,7 @@ Widget buildCampaniaCard(
                           ),
                         ),
                         Text(
-                          'Meta: ${currencyFormat.format(campania.metaRecaudacion)}',
+                          'Meta: ${currencyFormatter.format(campania.metaRecaudacion)}',
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 14,

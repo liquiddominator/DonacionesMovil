@@ -1,6 +1,5 @@
 import 'package:donaciones_movil/controllers/campania_controller.dart';
 import 'package:donaciones_movil/controllers/user_controller.dart';
-import 'package:donaciones_movil/models/usuario.dart';
 import 'package:donaciones_movil/views/campanias/detalle_campania_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

@@ -2,15 +2,14 @@ import 'package:donaciones_movil/controllers/detalle_asignacion_controller.dart'
 import 'package:donaciones_movil/controllers/donacion_asignacion_controller.dart';
 import 'package:donaciones_movil/controllers/saldos_donacion_controller.dart';
 import 'package:donaciones_movil/models/saldos_donacion.dart';
+import 'package:donaciones_movil/utils/currency_format.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 
 Widget buildSaldoInfo({
   required BuildContext context,
   required int donacionId,
   required double montoOriginal,
-  required NumberFormat currencyFormat,
   required Widget Function(String, String) buildDetailRow,
 }) {
   final saldoController = context.watch<SaldosDonacionController>();
@@ -43,9 +42,9 @@ Widget buildSaldoInfo({
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      buildDetailRow('Monto original:', currencyFormat.format(saldo.montoOriginal)),
-      buildDetailRow('Usado:', currencyFormat.format(totalUsado)),
-      buildDetailRow('Disponible:', currencyFormat.format(disponible < 0 ? 0 : disponible)),
+      buildDetailRow('Monto original:', currencyFormatter.format(saldo.montoOriginal)),
+      buildDetailRow('Usado:', currencyFormatter.format(totalUsado)),
+      buildDetailRow('Disponible:', currencyFormatter.format(disponible < 0 ? 0 : disponible)),
     ],
   );
 }

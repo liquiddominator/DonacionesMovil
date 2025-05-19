@@ -332,60 +332,6 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                   ),
                                   
                                   const SizedBox(height: 16),
-                                  
-                                  // Rol de usuario
-                                  _isLoadingRoles
-                                      ? Center(
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                                            child: CircularProgressIndicator(
-                                              valueColor: AlwaysStoppedAnimation<Color>(accentColor),
-                                              strokeWidth: 3,
-                                            ),
-                                          ),
-                                        )
-                                      : DropdownButtonFormField<int>(
-                                          value: _selectedRolId,
-                                          decoration: InputDecoration(
-                                            labelText: 'Rol de Usuario',
-                                            labelStyle: TextStyle(color: textColor.withOpacity(0.8)),
-                                            prefixIcon: Icon(Icons.admin_panel_settings_outlined, color: accentColor),
-                                            border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(10),
-                                              borderSide: BorderSide(color: accentColor, width: 2),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(10),
-                                              borderSide: BorderSide(color: Colors.grey.shade400),
-                                            ),
-                                            contentPadding: EdgeInsets.symmetric(vertical: 16),
-                                          ),
-                                          items: _roles.map((Rol rol) {
-                                            return DropdownMenuItem<int>(
-                                              value: rol.rolId,
-                                              child: Text(rol.nombre),
-                                            );
-                                          }).toList(),
-                                          onChanged: (int? value) {
-                                            setState(() {
-                                              _selectedRolId = value;
-                                            });
-                                          },
-                                          validator: (value) {
-                                            if (value == null) {
-                                              return 'Por favor seleccione un rol';
-                                            }
-                                            return null;
-                                          },
-                                          dropdownColor: Colors.white,
-                                          icon: Icon(Icons.arrow_drop_down, color: accentColor),
-                                        ),
-                                  
-                                  const SizedBox(height: 16),
-                                  
                                   // Contraseña
                                   TextFormField(
                                     controller: _passwordController,
@@ -472,12 +418,12 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                                 nombre: _nombreController.text,
                                                 apellido: _apellidoController.text,
                                                 telefono: _telefonoController.text.isNotEmpty
-                                                    ? _telefonoController.text
-                                                    : null,
+                                                ? _telefonoController.text
+                                                : null,
                                                 activo: true,
                                                 fechaRegistro: DateTime.now(),
+                                                imagenUrl: 'https://firebasestorage.googleapis.com/v0/b/transparenciadonaciones.firebasestorage.app/o/user_default.jpg?alt=media&token=5a749ef3-8eae-495e-b5b5-07d59b0d0006', // Imagen por defecto
                                               );
-
                                               final success = await authController.register(
                                                 newUsuario, 
                                                 _selectedRolId!

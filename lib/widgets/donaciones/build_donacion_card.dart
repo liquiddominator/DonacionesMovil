@@ -1,6 +1,7 @@
 import 'package:donaciones_movil/controllers/campania_controller.dart';
 import 'package:donaciones_movil/models/campania.dart';
 import 'package:donaciones_movil/models/donacion.dart';
+import 'package:donaciones_movil/utils/currency_format.dart';
 import 'package:donaciones_movil/views/donaciones/detalle_donacion_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -10,14 +11,12 @@ class BuildDonacionCard extends StatelessWidget {
   final Donacion donacion;
   final String campaniaNombre;
   final String estadoNombre;
-  final NumberFormat currencyFormat;
 
   const BuildDonacionCard({
     Key? key,
     required this.donacion,
     required this.campaniaNombre,
     required this.estadoNombre,
-    required this.currencyFormat,
   }) : super(key: key);
 
   @override
@@ -58,7 +57,7 @@ class BuildDonacionCard extends StatelessWidget {
           donacion.tipoDonacion == 'Monetaria' ? Icons.attach_money : Icons.card_giftcard,
           color: Colors.green,
         ),
-        title: Text(currencyFormat.format(donacion.monto)),
+        title: Text(currencyFormatter.format(donacion.monto)),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

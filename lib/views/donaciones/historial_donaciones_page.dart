@@ -4,7 +4,6 @@ import 'package:donaciones_movil/controllers/donacion_controller.dart';
 import 'package:donaciones_movil/controllers/estado_controller.dart';
 import 'package:donaciones_movil/widgets/donaciones/build_donacion_card.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class HistorialDonacionesPage extends StatefulWidget {
@@ -15,7 +14,6 @@ class HistorialDonacionesPage extends StatefulWidget {
 }
 
 class _HistorialDonacionesPageState extends State<HistorialDonacionesPage> {
-  final NumberFormat currencyFormat = NumberFormat.currency(locale: 'es_BO', symbol: 'Bs');
 
   bool _loading = true;
 
@@ -79,7 +77,6 @@ class _HistorialDonacionesPageState extends State<HistorialDonacionesPage> {
                       donacion: donacion,
                       campaniaNombre: campaniaNombres[donacion.campaniaId] ?? 'Campaña desconocida',
                       estadoNombre: estadoNombres[donacion.estadoId] ?? 'Desconocido',
-                      currencyFormat: currencyFormat,
                     );
                   },
                 ),

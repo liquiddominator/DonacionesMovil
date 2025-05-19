@@ -4,6 +4,7 @@ import 'package:donaciones_movil/controllers/saldos_donacion_controller.dart';
 import 'package:donaciones_movil/models/campania.dart';
 import 'package:donaciones_movil/models/donacion.dart';
 import 'package:donaciones_movil/models/saldos_donacion.dart';
+import 'package:donaciones_movil/utils/currency_format.dart';
 import 'package:donaciones_movil/widgets/donaciones/feedback_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +22,6 @@ class ConfirmarDonacionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.simpleCurrency(locale: 'es_BO');
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -38,7 +38,7 @@ class ConfirmarDonacionPage extends StatelessWidget {
             const SizedBox(height: 16),
             _detalle('Tipo de donación:', donacion.tipoDonacion),
             if (donacion.tipoDonacion == 'Monetaria')
-              _detalle('Monto:', currencyFormat.format(donacion.monto)),
+              _detalle('Monto:', currencyFormatter.format(donacion.monto)),
             if (donacion.tipoDonacion == 'Especie')
               _detalle('Descripción:', donacion.descripcion ?? 'Sin descripción'),
             _detalle('Anonimato:', donacion.esAnonima == true ? 'Sí' : 'No'),

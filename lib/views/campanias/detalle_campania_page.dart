@@ -1,9 +1,9 @@
-import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
 import 'package:donaciones_movil/controllers/user_controller.dart';
 import 'package:donaciones_movil/controllers/donacion_controller.dart';
 import 'package:donaciones_movil/models/campania.dart';
 import 'package:donaciones_movil/models/usuario.dart';
 import 'package:donaciones_movil/models/donacion.dart';
+import 'package:donaciones_movil/utils/currency_format.dart';
 import 'package:donaciones_movil/views/campanias/donacion_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -48,7 +48,6 @@ class _DetalleCampaniaPageState extends State<DetalleCampaniaPage> {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.simpleCurrency(locale: 'es_BO');
     final userController = Provider.of<UserController>(context, listen: false);
 
     final creador = userController.usuarios?.firstWhere(
@@ -71,8 +70,8 @@ class _DetalleCampaniaPageState extends State<DetalleCampaniaPage> {
           children: [
             Text(widget.campania.descripcion, style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 16),
-            Text('Meta: ${currencyFormat.format(widget.campania.metaRecaudacion)}'),
-            Text('Recaudado: ${currencyFormat.format(widget.campania.montoRecaudado ?? 0)}'),
+            Text('Meta: ${currencyFormatter.format(widget.campania.metaRecaudacion)}'),
+            Text('Recaudado: ${currencyFormatter.format(widget.campania.montoRecaudado ?? 0)}'),
             const SizedBox(height: 8),
             Text('Inicio: ${DateFormat.yMMMd().format(widget.campania.fechaInicio)}'),
             if (widget.campania.fechaFin != null)
@@ -119,7 +118,7 @@ _cargandoDonaciones
 
               return ListTile(
                 leading: const Icon(Icons.attach_money),
-                title: Text('Monto: ${currencyFormat.format(donacion.monto)}'),
+                title: Text('Monto: ${currencyFormatter.format(donacion.monto)}'),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -164,17 +163,12 @@ _cargandoDonaciones
                 onPressed: () {
                   final url = 'https://www.unicef.org.bo/?utm_source=google&utm_medium=cpa&utm_campaign=Search-Categoria-AON-Bolivia&utm_term=Kewywords+Frase&utm_content=anuncio_texto_1&utm_source=paidsearch_google&utm_medium=cpa&&utm_term=brand&utm_content=anuncio_dinamico&utm_campaign=search&gad_source=1&gad_campaignid=22433964452&gclid=CjwKCAjw8IfABhBXEiwAxRHlsGVu1YKd7wlxpFPOR1nBbHkwolgxx40ywbY1pNewJ2B4Y_5ItO-pgxoCSVYQAvD_BwE';
                   final mensaje = '''
-¡Apoya esta causa! 💚
-
-${widget.campania.titulo}
-
-${widget.campania.descripcion}
-
-Meta: ${currencyFormat.format(widget.campania.metaRecaudacion)}
-
-Dona aquí: $url
-''';
-
+                  ¡Apoya esta causa! 💚
+                  ${widget.campania.titulo}
+                  ${widget.campania.descripcion}
+                  Meta: ${currencyFormatter.format(widget.campania.metaRecaudacion)}
+                  Dona aquí: $url
+                  ''';
                   Share.share(mensaje);
                 },
                 icon: const Icon(Icons.share),

@@ -1,4 +1,5 @@
 import 'package:donaciones_movil/models/saldos_donacion.dart';
+import 'package:donaciones_movil/utils/currency_format.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:donaciones_movil/controllers/saldos_donacion_controller.dart';
@@ -9,17 +10,11 @@ class TransparencyPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(
-      locale: 'es_BO',
-      symbol: 'Bs',
-      decimalDigits: 2,
-    );
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Transparencia de Fondos'),
       ),
-      body: _buildTransparencyContent(context, currencyFormat),
+      body: _buildTransparencyContent(context, currencyFormatter),
     );
   }
 

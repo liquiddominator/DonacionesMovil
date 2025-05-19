@@ -1,3 +1,4 @@
+import 'package:donaciones_movil/utils/currency_format.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +10,6 @@ import 'package:donaciones_movil/models/detalle_asignacion.dart';
 
 List<Widget> buildAsignacionesInfo({
   required BuildContext context,
-  required NumberFormat currencyFormat,
 }) {
   final daController = context.watch<DonacionAsignacionController>();
   final asignacionController = context.watch<AsignacionController>();
@@ -54,7 +54,7 @@ List<Widget> buildAsignacionesInfo({
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
-            Text('Monto asignado desde esta donación: ${currencyFormat.format(da.montoAsignado)}'),
+            Text('Monto asignado desde esta donación: ${currencyFormatter.format(da.montoAsignado)}'),
             if (asignacion?.fechaAsignacion != null)
               Text('Fecha de asignación: ${DateFormat.yMMMd().format(asignacion!.fechaAsignacion!)}'),
             const SizedBox(height: 8),
@@ -72,7 +72,7 @@ List<Widget> buildAsignacionesInfo({
               Padding(
                 padding: const EdgeInsets.only(top: 6),
                 child: Text(
-                  'Total detallado: ${currencyFormat.format(totalDetalle)}',
+                  'Total detallado: ${currencyFormatter.format(totalDetalle)}',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),

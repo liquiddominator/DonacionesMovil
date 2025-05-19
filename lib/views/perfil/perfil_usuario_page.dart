@@ -47,15 +47,17 @@ class _PerfilUsuarioPageState extends State<PerfilUsuarioPage> {
       setState(() => _isLoading = true);
       
       final updatedUser = Usuario(
-        usuarioId: usuarioActual.usuarioId,
-        nombre: _nombreController.text,
-        apellido: _apellidoController.text,
-        email: _emailController.text,
-        contrasena: usuarioActual.contrasena,
-        telefono: _telefonoController.text,
-        activo: usuarioActual.activo,
-        fechaRegistro: usuarioActual.fechaRegistro,
-      );
+  usuarioId: usuarioActual.usuarioId,
+  nombre: _nombreController.text,
+  apellido: _apellidoController.text,
+  email: _emailController.text,
+  contrasena: usuarioActual.contrasena,
+  telefono: _telefonoController.text,
+  activo: usuarioActual.activo,
+  fechaRegistro: usuarioActual.fechaRegistro,
+  imagenUrl: usuarioActual.imagenUrl, // ✅ conservar la imagen actual
+);
+
 
       final userController = Provider.of<UserController>(context, listen: false);
       final authController = Provider.of<AuthController>(context, listen: false);
@@ -178,15 +180,21 @@ Widget build(BuildContext context) {
                       CircleAvatar(
                         radius: 50,
                         backgroundColor: Colors.white,
-                        child: Text(
+                        backgroundImage: (user.imagenUrl != null && user.imagenUrl!.isNotEmpty)
+                        ? NetworkImage(user.imagenUrl!)
+                        : null,
+                        child: (user.imagenUrl == null || user.imagenUrl!.isEmpty)
+                        ? Text(
                           '${user.nombre[0]}${user.apellido[0]}',
                           style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
                             color: theme.primaryColor,
                           ),
-                        ),
+                        )
+                        : null,
                       ),
+
                       const SizedBox(height: 16),
                       Text(
                         '${user.nombre} ${user.apellido}',

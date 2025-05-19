@@ -22,12 +22,6 @@ class DashboardPage extends StatefulWidget {
 
 
 class _DashboardPageState extends State<DashboardPage> {
-  final currencyFormat = NumberFormat.currency(
-    locale: 'es_BO',
-    symbol: 'Bs',
-    decimalDigits: 2,
-  );
-  
   bool _isRefreshing = false;
 
   @override
@@ -235,7 +229,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    buildSummaryCards(context, currencyFormat),
+                    buildSummaryCards(context),
                     const SizedBox(height: 15),
                     
                     const Text(
@@ -251,7 +245,6 @@ class _DashboardPageState extends State<DashboardPage> {
                       height: 450,
                       child: buildCampaniasLista(
                         context,
-                        currencyFormat,
                         _refreshData,
                       ),
                     ),

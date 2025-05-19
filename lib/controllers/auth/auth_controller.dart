@@ -1,3 +1,4 @@
+import 'package:bcrypt/bcrypt.dart';
 import 'package:donaciones_movil/models/rol.dart';
 import 'package:donaciones_movil/models/usuario.dart';
 import 'package:donaciones_movil/models/usuario_rol.dart';
@@ -76,39 +77,52 @@ class AuthController extends ChangeNotifier {
 
   // Registro
   Future<bool> register(Usuario usuario, int rolId) async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
+  _isLoading = true;
+  _error = null;
+  notifyListeners();
 
-    try {
-      // Crear el usuario
-      _currentUser = await _usuarioService.createUsuario(usuario);
-      
-      // Asignar rol al usuario
-      if (_currentUser != null) {
-        final usuarioRol = UsuarioRol(
-          usuarioRolId: 0, // El ID será asignado por la API
-          usuarioId: _currentUser!.usuarioId,
-          rolId: rolId,
-          fechaAsignacion: DateTime.now(),
-        );
-        
-        await _usuarioRolService.createUsuarioRol(usuarioRol);
-        
-        // Cargar roles del usuario
-        await _loadUserRoles(_currentUser!.usuarioId);
-      }
-      
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      return false;
+  try {
+    // Encriptar la contraseña antes de enviarla
+    final hashedPassword = BCrypt.hashpw(usuario.contrasena, BCrypt.gensalt());
+
+    // Crear copia del usuario con contraseña hasheada
+    final usuarioHashed = Usuario(
+      usuarioId: usuario.usuarioId,
+      email: usuario.email,
+      contrasena: hashedPassword,
+      nombre: usuario.nombre,
+      apellido: usuario.apellido,
+      telefono: usuario.telefono,
+      imagenUrl: usuario.imagenUrl,
+      activo: usuario.activo,
+      fechaRegistro: usuario.fechaRegistro,
+    );
+
+    // Crear el usuario
+    _currentUser = await _usuarioService.createUsuario(usuarioHashed);
+
+    // Asignar rol
+    if (_currentUser != null) {
+      final usuarioRol = UsuarioRol(
+        usuarioRolId: 0,
+        usuarioId: _currentUser!.usuarioId,
+        rolId: rolId,
+        fechaAsignacion: DateTime.now(),
+      );
+      await _usuarioRolService.createUsuarioRol(usuarioRol);
+      await _loadUserRoles(_currentUser!.usuarioId);
     }
+
+    _isLoading = false;
+    notifyListeners();
+    return true;
+  } catch (e) {
+    _error = e.toString();
+    _isLoading = false;
+    notifyListeners();
+    return false;
   }
+}
 
   // Comprobar si el usuario tiene un rol específico
   bool hasRole(String rolName) {
