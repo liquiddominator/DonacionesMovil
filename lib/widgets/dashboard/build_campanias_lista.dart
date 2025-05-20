@@ -2,7 +2,6 @@ import 'package:donaciones_movil/controllers/campania_controller.dart';
 import 'package:donaciones_movil/controllers/user_controller.dart';
 import 'package:donaciones_movil/models/campania.dart';
 import 'package:donaciones_movil/models/usuario.dart';
-import 'package:donaciones_movil/utils/currency_format.dart';
 import 'package:donaciones_movil/widgets/dashboard/build_campania_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

@@ -7,6 +7,7 @@ import 'package:donaciones_movil/models/campania.dart';
 import 'package:donaciones_movil/models/donacion.dart';
 import 'package:donaciones_movil/utils/currency_format.dart';
 import 'package:donaciones_movil/widgets/donaciones/build_saldo_info.dart';
+import 'package:donaciones_movil/widgets/donaciones/comprobante_pdf_util.dart';
 import 'package:donaciones_movil/widgets/donaciones/detalle_donacion_asignaciones.dart';
 import 'package:donaciones_movil/widgets/donaciones/detalle_donacion_row.dart';
 import 'package:flutter/material.dart';
@@ -139,7 +140,14 @@ await asignacionController.updateAsignacion(asignacionActualizada);
                           ElevatedButton.icon(
                             icon: const Icon(Icons.picture_as_pdf),
                             label: const Text('Descargar comprobante PDF'),
-                            onPressed: tieneAsignaciones ? () => _generarComprobantePdf(context) : null,
+                            onPressed: tieneAsignaciones
+                              ? () => generarComprobantePdf(
+                                context: context,
+                                donacion: widget.donacion,
+                                campania: widget.campania,
+                                nombreEstado: widget.nombreEstado,
+                              )
+                              : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: tieneAsignaciones ? Colors.teal : Colors.grey,
                               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -155,7 +163,7 @@ await asignacionController.updateAsignacion(asignacionActualizada);
                             ),
                           const SizedBox(height: 24),
                           const Divider(),
-                          const Text('Gracias por tu aporte ❤️', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                          const Text('Gracias por tu aporte', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                         ],
                       );
                     },
@@ -164,77 +172,5 @@ await asignacionController.updateAsignacion(asignacionActualizada);
         ),
       ),
     );
-  }
-
-  Future<void> _generarComprobantePdf(BuildContext context) async {
-    final pdf = pw.Document();
-    final daController = context.read<DonacionAsignacionController>();
-    final asignacionController = context.read<AsignacionController>();
-    final detalleController = context.read<DetalleAsignacionController>();
-
-    final donacionAsignaciones = daController.donacionAsignaciones ?? [];
-    double totalUsado = 0;
-
-    pdf.addPage(
-      pw.MultiPage(
-        build: (context) => [
-          pw.Text('Comprobante de uso de donación', style: pw.TextStyle(fontSize: 20)),
-          pw.SizedBox(height: 16),
-          pw.Text('Donación: Bs${widget.donacion.monto.toStringAsFixed(2)}'),
-          pw.Text('Campaña: ${widget.campania.titulo}'),
-          pw.Text('Estado: ${widget.nombreEstado}'),
-          pw.Text('Fecha: ${widget.donacion.fechaDonacion != null ? DateFormat.yMMMd().format(widget.donacion.fechaDonacion!) : 'N/D'}'),
-          pw.SizedBox(height: 20),
-          pw.Text('Asignaciones', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
-          ...donacionAsignaciones.map((da) {
-            Asignacion? asignacion;
-            try {//
-              asignacion = asignacionController.asignaciones.firstWhere((a) => a.asignacionId == da.asignacionId);
-            } catch (_) {
-              asignacion = null;
-            }
-
-            final detalles = detalleController.detalles
-                    ?.where((d) => d.asignacionId == da.asignacionId)
-                    .toList() ??
-                [];
-
-            final subtotal = detalles.fold<double>(0, (sum, d) => sum + (d.cantidad * d.precioUnitario));
-            totalUsado += subtotal;
-
-            return pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.SizedBox(height: 10),
-                pw.Text('Asignación: ${asignacion?.descripcion ?? 'Sin descripción'}'),
-                pw.Text('Monto asignado: Bs${da.montoAsignado.toStringAsFixed(2)}'),
-                if (asignacion?.fechaAsignacion != null)
-                  pw.Text('Fecha: ${DateFormat.yMMMd().format(asignacion!.fechaAsignacion!)}'),
-                pw.Text('Detalles:'),
-                ...detalles.map((d) {
-                  final sub = d.cantidad * d.precioUnitario;
-                  return pw.Bullet(
-                    text: '${d.concepto} - ${d.cantidad} x Bs${d.precioUnitario} = Bs${sub.toStringAsFixed(2)}',
-                  );
-                }),
-                if (detalles.isNotEmpty)
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.only(top: 4),
-                    child: pw.Text(
-                      'Total: Bs${subtotal.toStringAsFixed(2)}',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                    ),
-                  ),
-              ],
-            );
-          }).toList(),
-          pw.Divider(),
-          pw.Text('Total utilizado: Bs${totalUsado.toStringAsFixed(2)}', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
-          pw.Text('Saldo disponible: Bs${(widget.donacion.monto - totalUsado).clamp(0, widget.donacion.monto).toStringAsFixed(2)}'),
-        ],
-      ),
-    );
-
-    await Printing.layoutPdf(onLayout: (format) => pdf.save());
   }
 }

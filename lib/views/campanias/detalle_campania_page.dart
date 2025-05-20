@@ -63,125 +63,158 @@ class _DetalleCampaniaPageState extends State<DetalleCampaniaPage> {
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.campania.titulo)),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(widget.campania.descripcion, style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 16),
-            Text('Meta: ${currencyFormatter.format(widget.campania.metaRecaudacion)}'),
-            Text('Recaudado: ${currencyFormatter.format(widget.campania.montoRecaudado ?? 0)}'),
-            const SizedBox(height: 8),
-            Text('Inicio: ${DateFormat.yMMMd().format(widget.campania.fechaInicio)}'),
-            if (widget.campania.fechaFin != null)
-              Text('Fin: ${DateFormat.yMMMd().format(widget.campania.fechaFin!)}'),
-            const SizedBox(height: 8),
-            Text(
-              'Estado: ${widget.campania.activa == true ? 'Activa' : 'Inactiva'}',
-              style: TextStyle(
-                color: widget.campania.activa == true ? Colors.green : Colors.red,
-                fontWeight: FontWeight.bold,
-              ),
+      body: SingleChildScrollView(
+  padding: const EdgeInsets.all(16),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Imagen destacada
+      if (widget.campania.imagenUrl != null && widget.campania.imagenUrl!.isNotEmpty)
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.network(
+            widget.campania.imagenUrl!,
+            height: 200,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              height: 200,
+              color: Colors.grey[300],
+              alignment: Alignment.center,
+              child: const Icon(Icons.broken_image, size: 40),
             ),
-            const SizedBox(height: 12),
-            if (creador != null)
-              Text(
-                'Contacto del administrador: ${creador.email}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontStyle: FontStyle.italic,
-                  color: Colors.blueGrey,
-                ),
-              ),
-            const SizedBox(height: 16),
-const Text(
-  'Últimas donaciones realizadas a esta campaña',
-  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-),
-_cargandoDonaciones
-    ? const Center(child: CircularProgressIndicator())
-    : _ultimasDonaciones.isEmpty
-        ? const Text('Aún no hay donaciones registradas.')
-        : Column(
-            children: _ultimasDonaciones.map((donacion) {
-              final usuario = userController.usuarios?.firstWhere(
-                (u) => u.usuarioId == donacion.usuarioId,
-                orElse: () => Usuario(
-                  usuarioId: 0,
-                  email: 'Desconocido',
-                  contrasena: '',
-                  nombre: '',
-                  apellido: '',
-                ),
-              );
-
-              return ListTile(
-                leading: const Icon(Icons.attach_money),
-                title: Text('Monto: ${currencyFormatter.format(donacion.monto)}'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Fecha: ${DateFormat.yMMMd().format(donacion.fechaDonacion ?? DateTime.now())}'),
-                    Text(
-                      donacion.esAnonima == true
-                          ? '(Donante anónimo)'
-                          : 'Donante: ${usuario?.email ?? 'Desconocido'}',
-                      style: const TextStyle(fontStyle: FontStyle.italic),
-                    ),
-                  ],
-                ),
-                isThreeLine: true,
-              );
-            }).toList(),
           ),
+        )
+      else
+        Container(
+          height: 200,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.grey[300],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          alignment: Alignment.center,
+          child: const Icon(Icons.image_not_supported, size: 40),
+        ),
 
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => DonacionPage(campania: widget.campania),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.volunteer_activism),
-                label: const Text('Donar a esta campaña'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  textStyle: const TextStyle(fontSize: 16),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  final url = 'https://www.unicef.org.bo/?utm_source=google&utm_medium=cpa&utm_campaign=Search-Categoria-AON-Bolivia&utm_term=Kewywords+Frase&utm_content=anuncio_texto_1&utm_source=paidsearch_google&utm_medium=cpa&&utm_term=brand&utm_content=anuncio_dinamico&utm_campaign=search&gad_source=1&gad_campaignid=22433964452&gclid=CjwKCAjw8IfABhBXEiwAxRHlsGVu1YKd7wlxpFPOR1nBbHkwolgxx40ywbY1pNewJ2B4Y_5ItO-pgxoCSVYQAvD_BwE';
-                  final mensaje = '''
-                  ¡Apoya esta causa! 💚
-                  ${widget.campania.titulo}
-                  ${widget.campania.descripcion}
-                  Meta: ${currencyFormatter.format(widget.campania.metaRecaudacion)}
-                  Dona aquí: $url
-                  ''';
-                  Share.share(mensaje);
-                },
-                icon: const Icon(Icons.share),
-                label: const Text('Compartir campaña'),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  textStyle: const TextStyle(fontSize: 16),
-                ),
-              ),
-            ),
-          ],
+      const SizedBox(height: 16),
+
+      Text(widget.campania.descripcion, style: const TextStyle(fontSize: 16)),
+      const SizedBox(height: 16),
+      Text('Meta: ${currencyFormatter.format(widget.campania.metaRecaudacion)}'),
+      Text('Recaudado: ${currencyFormatter.format(widget.campania.montoRecaudado ?? 0)}'),
+      const SizedBox(height: 8),
+      Text('Inicio: ${DateFormat.yMMMd().format(widget.campania.fechaInicio)}'),
+      if (widget.campania.fechaFin != null)
+        Text('Fin: ${DateFormat.yMMMd().format(widget.campania.fechaFin!)}'),
+      const SizedBox(height: 8),
+      Text(
+        'Estado: ${widget.campania.activa == true ? 'Activa' : 'Inactiva'}',
+        style: TextStyle(
+          color: widget.campania.activa == true ? Colors.green : Colors.red,
+          fontWeight: FontWeight.bold,
         ),
       ),
+      const SizedBox(height: 12),
+      if (creador != null)
+        Text(
+          'Contacto del administrador: ${creador.email}',
+          style: const TextStyle(
+            fontSize: 14,
+            fontStyle: FontStyle.italic,
+            color: Colors.blueGrey,
+          ),
+        ),
+
+      const SizedBox(height: 16),
+      const Text(
+        'Últimas donaciones realizadas a esta campaña',
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+      _cargandoDonaciones
+          ? const Center(child: CircularProgressIndicator())
+          : _ultimasDonaciones.isEmpty
+              ? const Text('Aún no hay donaciones registradas.')
+              : Column(
+                  children: _ultimasDonaciones.map((donacion) {
+                    final usuario = userController.usuarios?.firstWhere(
+                      (u) => u.usuarioId == donacion.usuarioId,
+                      orElse: () => Usuario(
+                        usuarioId: 0,
+                        email: 'Desconocido',
+                        contrasena: '',
+                        nombre: '',
+                        apellido: '',
+                      ),
+                    );
+
+                    return ListTile(
+                      leading: const Icon(Icons.attach_money),
+                      title: Text('Monto: ${currencyFormatter.format(donacion.monto)}'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Fecha: ${DateFormat.yMMMd().format(donacion.fechaDonacion ?? DateTime.now())}'),
+                          Text(
+                            donacion.esAnonima == true
+                                ? '(Donante anónimo)'
+                                : 'Donante: ${usuario?.email ?? 'Desconocido'}',
+                            style: const TextStyle(fontStyle: FontStyle.italic),
+                          ),
+                        ],
+                      ),
+                      isThreeLine: true,
+                    );
+                  }).toList(),
+                ),
+
+      const SizedBox(height: 16),
+      SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => DonacionPage(campania: widget.campania),
+              ),
+            );
+          },
+          icon: const Icon(Icons.volunteer_activism),
+          label: const Text('Donar a esta campaña'),
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            textStyle: const TextStyle(fontSize: 16),
+          ),
+        ),
+      ),
+      const SizedBox(height: 8),
+      SizedBox(
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          onPressed: () {
+            final url = 'https://www.unicef.org.bo/';
+            final mensaje = '''
+¡Apoya esta causa! 💚
+${widget.campania.titulo}
+${widget.campania.descripcion}
+Meta: ${currencyFormatter.format(widget.campania.metaRecaudacion)}
+Dona aquí: $url
+''';
+            Share.share(mensaje);
+          },
+          icon: const Icon(Icons.share),
+          label: const Text('Compartir campaña'),
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            textStyle: const TextStyle(fontSize: 16),
+          ),
+        ),
+      ),
+    ],
+  ),
+),
+
     );
   }
 }

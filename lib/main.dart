@@ -12,7 +12,6 @@ import 'package:donaciones_movil/controllers/rol_controller.dart';
 import 'package:donaciones_movil/controllers/saldos_donacion_controller.dart';
 import 'package:donaciones_movil/controllers/user_controller.dart';
 import 'package:donaciones_movil/controllers/usuario_rol_controller.dart';
-import 'package:donaciones_movil/firebase_options.dart';
 import 'package:donaciones_movil/views/auth/login_page.dart';
 import 'package:donaciones_movil/views/auth/splash_page.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -22,9 +21,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp();
   await initializeDateFormatting('es_BO', null);
   runApp(const MyApp());
 }

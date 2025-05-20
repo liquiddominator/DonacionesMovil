@@ -14,21 +14,19 @@ Widget buildCampaniaCard(
   Color? textColor,
   Color? accentColor,
 }) {
-  // Usar los colores del tema si no se proporcionan colores personalizados
   final themeColor = Theme.of(context).primaryColor;
   final primary = primaryColor ?? themeColor;
-  
+
   final progress = (campania.montoRecaudado ?? 0) / campania.metaRecaudacion;
   final porcentaje = (progress * 100).clamp(0, 100).toStringAsFixed(1);
-  final diasRestantes = campania.fechaFin != null 
-      ? campania.fechaFin!.difference(DateTime.now()).inDays 
+  final diasRestantes = campania.fechaFin != null
+      ? campania.fechaFin!.difference(DateTime.now()).inDays
       : null;
 
   final creador = usuariosMap[campania.usuarioIdcreador];
-  
-  // Color para indicar estado de la campaña
-  final statusColor = progress >= 1 
-      ? Colors.green 
+
+  final statusColor = progress >= 1
+      ? Colors.green
       : diasRestantes != null && diasRestantes <= 5
           ? Colors.orange
           : primary;
@@ -49,81 +47,92 @@ Widget buildCampaniaCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header con imagen de fondo o color
-          Container(
-            height: 90,
-            decoration: BoxDecoration(
+          // Imagen con overlay o fallback color
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
+            ),
+            child: Container(
+              height: 160,
               color: primary.withOpacity(0.8),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  if (campania.imagenUrl != null && campania.imagenUrl!.isNotEmpty)
+                    Image.network(
+                      campania.imagenUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.broken_image, size: 40),
+                      ),
+                    ),
+                  Container(
+                    color: Colors.black45, // overlay
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Text(
+                        campania.titulo,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              blurRadius: 3,
+                              color: Colors.black45,
+                              offset: Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                  if (diasRestantes != null)
+                    Positioned(
+                      top: 12,
+                      right: 12,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.timer_outlined,
+                              color: diasRestantes > 10 ? Colors.white : Colors.orange,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '$diasRestantes días',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
-            child: Stack(
-              children: [
-                // Título de campaña superpuesto
-                Positioned(
-                  bottom: 12,
-                  left: 16,
-                  right: 16,
-                  child: Text(
-                    campania.titulo,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      shadows: [
-                        Shadow(
-                          blurRadius: 3,
-                          color: Colors.black45,
-                          offset: Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                
-                // Indicador de tiempo restante
-                if (diasRestantes != null)
-                  Positioned(
-                    top: 12,
-                    right: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black54,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.timer_outlined,
-                            color: diasRestantes > 10 ? Colors.white : Colors.orange,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '$diasRestantes días',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
           ),
-          
+
           // Contenido principal
           Padding(
             padding: const EdgeInsets.all(16),
@@ -141,10 +150,10 @@ Widget buildCampaniaCard(
                     color: Colors.grey[700],
                   ),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
-                // Información del creador con icono
+
+                // Información del creador
                 if (creador != null)
                   Row(
                     children: [
@@ -182,14 +191,13 @@ Widget buildCampaniaCard(
                       ),
                     ],
                   ),
-                
+
                 const SizedBox(height: 20),
-                
-                // Barra de progreso mejorada
+
+                // Progreso
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Monto recaudado y meta
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -211,10 +219,7 @@ Widget buildCampaniaCard(
                         ),
                       ],
                     ),
-                    
                     const SizedBox(height: 8),
-                    
-                    // Barra de progreso con indicador porcentual
                     Stack(
                       alignment: Alignment.center,
                       children: [
@@ -246,8 +251,8 @@ Widget buildCampaniaCard(
                     ),
                   ],
                 ),
-                
-                // Badge con estado de la campaña
+
+                // Badge final
                 if (progress >= 1.0 || (diasRestantes != null && diasRestantes <= 5))
                   Padding(
                     padding: const EdgeInsets.only(top: 12),

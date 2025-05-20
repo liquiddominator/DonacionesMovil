@@ -85,153 +85,189 @@ class _CampaniasActivasScreenState extends State<CampaniaListPage> {
               // Calcular progreso
               final progress = (campania.montoRecaudado ?? 0) / campania.metaRecaudacion;
 
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                elevation: 2,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(10),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetalleCampaniaPage(campania: campania),
-                      ),
-                    );
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header con color
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: themeColor,
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                campania.titulo,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            if (campania.fechaFin != null)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.black26,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  DateFormat('dd/MM/yy').format(campania.fechaFin!),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                      
-                      // Contenido
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Descripción
-                            Text(
-                              campania.descripcion.length > 70
-                                  ? '${campania.descripcion.substring(0, 70)}...'
-                                  : campania.descripcion,
-                              style: TextStyle(
-                                color: Colors.grey[700],
-                                height: 1.3,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            
-                            const SizedBox(height: 12),
-                            
-                            // Montos
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  currencyFormat.format(campania.montoRecaudado ?? 0),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: progress >= 1.0 ? Colors.green : themeColor,
-                                  ),
-                                ),
-                                Text(
-                                  'Meta: ${currencyFormat.format(campania.metaRecaudacion)}',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            
-                            const SizedBox(height: 6),
-                            
-                            // Barra de progreso
-                            LinearPercentIndicator(
-                              lineHeight: 12,
-                              percent: progress.clamp(0.0, 1.0),
-                              backgroundColor: Colors.grey[200],
-                              progressColor: progress >= 1.0 ? Colors.green : themeColor,
-                              barRadius: const Radius.circular(6),
-                              padding: EdgeInsets.zero,
-                              animation: true,
-                            ),
-                            
-                            const SizedBox(height: 10),
-                            
-                            // Creador
-                            if (creador != null)
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.person_outline, 
-                                    size: 16, 
-                                    color: Colors.grey[600],
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Expanded(
-                                    child: Text(
-                                      '${creador.nombre} ${creador.apellido}',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
+              // Dentro del ListView.builder > itemBuilder
+
+return Card(
+  margin: const EdgeInsets.only(bottom: 12),
+  elevation: 2,
+  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+  child: InkWell(
+    borderRadius: BorderRadius.circular(10),
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DetalleCampaniaPage(campania: campania),
+        ),
+      );
+    },
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: themeColor,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  campania.titulo,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (campania.fechaFin != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.black26,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    DateFormat('dd/MM/yy').format(campania.fechaFin!),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
-              );
+            ],
+          ),
+        ),
+
+        // Cuerpo con imagen + contenido
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              // Imagen
+              if (campania.imagenUrl != null && campania.imagenUrl!.isNotEmpty)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    campania.imagenUrl!,
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: 100,
+                      height: 100,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.broken_image, size: 30),
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.image_not_supported, size: 30),
+                ),
+
+              const SizedBox(width: 12),
+
+              // Texto principal
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Descripción
+                    Text(
+                      campania.descripcion.length > 80
+                          ? '${campania.descripcion.substring(0, 80)}...'
+                          : campania.descripcion,
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        height: 1.3,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // Montos
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          currencyFormat.format(campania.montoRecaudado ?? 0),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: progress >= 1.0 ? Colors.green : themeColor,
+                          ),
+                        ),
+                        Text(
+                          'Meta: ${currencyFormat.format(campania.metaRecaudacion)}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    // Progreso
+                    LinearPercentIndicator(
+                      lineHeight: 10,
+                      percent: progress.clamp(0.0, 1.0),
+                      backgroundColor: Colors.grey[200],
+                      progressColor: progress >= 1.0 ? Colors.green : themeColor,
+                      barRadius: const Radius.circular(5),
+                      padding: EdgeInsets.zero,
+                      animation: true,
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    // Creador
+                    if (creador != null)
+                      Row(
+                        children: [
+                          const Icon(Icons.person_outline, size: 14, color: Colors.grey),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              '${creador.nombre} ${creador.apellido}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  ),
+);
+
             },
           );
         },
