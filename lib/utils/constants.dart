@@ -8,6 +8,7 @@ class ApiConstants {
   static const userEndpoint = '$apiUrl/Usuarios';
   static const campaniaEndpoint = '$apiUrl/Campanias';
   static const donacionEndpoint = '$apiUrl/Donaciones';
+  static const campaniaDonantesCountEndpoint = '$donacionEndpoint/campania';
   static const saldosDonacionEndpoint = '$apiUrl/SaldosDonaciones';
   static const mensajeEndpoint = '$apiUrl/Mensajes';
   static const respuestaMensajeEndpoint = '$apiUrl/RespuestasMensajes';

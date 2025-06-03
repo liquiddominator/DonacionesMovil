@@ -1,98 +1,100 @@
+import 'package:donaciones_movil/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 class SplashPage extends StatefulWidget {
   final Widget nextScreen;
-
   const SplashPage({Key? key, required this.nextScreen}) : super(key: key);
 
   @override
   State<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
+class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   double _progressValue = 0.0;
-  
-  final List<String> _featurePoints = [
-    "Transparencia en tiempo real",
-    "Seguimiento de donaciones",
-    "Información verificada",
-    "Reportes detallados",
-    "Conexión directa con donantes"
+  Timer? _timer;
+
+  final List<String> _loadingTexts = [
+    'Cargando datos...',
+    'Sincronizando campañas...',
+    'Casi listo...'
   ];
-  
-  late List<bool> _pointsVisible;
-  Timer? _progressTimer;
-  List<Timer> _pointTimers = [];
+  String _currentText = 'Cargando datos...';
+
+  late final AnimationController _logoController;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<double> _scaleAnimation;
+  late final Animation<Offset> _slideAnimation;
+
+  late final List<AnimationController> _featureControllers;
+  late final List<Animation<Offset>> _featureAnimations;
+  late final List<Animation<double>> _featureOpacities;
 
   @override
   void initState() {
     super.initState();
-    
-    _pointsVisible = List.generate(_featurePoints.length, (_) => false);
-    
-    _animationController = AnimationController(
+
+    // Logo animation mejorada
+    _logoController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(milliseconds: 1800),
     );
-    
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Interval(0.0, 0.7, curve: Curves.easeInOut),
-      ),
+
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.easeInOutQuad),
     );
-    
-    _scaleAnimation = Tween<double>(begin: 0.7, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Interval(0.3, 1.0, curve: Curves.elasticOut),
-      ),
+
+    _scaleAnimation = Tween<double>(begin: 0.3, end: 1).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.easeOutBack),
     );
-    
-    _animationController.forward();
-    
-    // Animación de la barra de progreso
-    _progressTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.15),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.easeOutExpo),
+    );
+
+    _logoController.forward();
+
+    // Features animation
+    _featureControllers = List.generate(3, (_) {
+      return AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 600),
+      );
+    });
+
+    _featureAnimations = _featureControllers.map((controller) {
+      return Tween<Offset>(
+        begin: const Offset(0, 0.2),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeOut));
+    }).toList();
+
+    _featureOpacities = _featureControllers.map((controller) {
+      return Tween<double>(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(parent: controller, curve: Curves.easeIn),
+      );
+    }).toList();
+
+    Future.delayed(const Duration(milliseconds: 500), () => _featureControllers[0].forward());
+    Future.delayed(const Duration(milliseconds: 900), () => _featureControllers[1].forward());
+    Future.delayed(const Duration(milliseconds: 1300), () => _featureControllers[2].forward());
+
+    // Progress bar timer
+    _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (_progressValue < 1.0) {
-        if (mounted) {
-          setState(() {
-            _progressValue += 0.02;
-          });
-        }
+        setState(() {
+          _progressValue += 0.02;
+          int index = (_progressValue * _loadingTexts.length).clamp(0, 2).toInt();
+          _currentText = _loadingTexts[index];
+        });
       } else {
         timer.cancel();
-      }
-    });
-    
-    // Mostrar los puntos de descripción secuencialmente
-    for (int i = 0; i < _featurePoints.length; i++) {
-      final timer = Timer(Duration(milliseconds: 500 + (i * 300)), () {
-        if (mounted) {
-          setState(() {
-            _pointsVisible[i] = true;
-          });
-        }
-      });
-      _pointTimers.add(timer);
-    }
-    
-    // Temporizador para navegar a la siguiente pantalla
-    Timer(const Duration(seconds: 5), () {
-      if (mounted) {
         Navigator.pushReplacement(
           context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => widget.nextScreen,
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              var fadeIn = Tween<double>(begin: 0.0, end: 1.0).animate(animation);
-              return FadeTransition(opacity: fadeIn, child: child);
-            },
-            transitionDuration: Duration(milliseconds: 800),
-          ),
+          MaterialPageRoute(builder: (_) => widget.nextScreen),
         );
       }
     });
@@ -100,250 +102,224 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
   @override
   void dispose() {
-    // Cancelar todos los timers y animaciones
-    _progressTimer?.cancel();
-    for (var timer in _pointTimers) {
-      timer.cancel();
+    _logoController.dispose();
+    for (final c in _featureControllers) {
+      c.dispose();
     }
-    _animationController.dispose();
+    _timer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Colores naranja pastel
-    const Color primaryColor = Color(0xFFFFB74D); // Naranja claro
-    const Color secondaryColor = Color(0xFFFFCCBC); // Naranja pastel más claro
-    const Color backgroundColor = Color(0xFFFFF3E0); // Fondo naranja muy suave
-    const Color accentColor = Color(0xFFFF8A65); // Naranja más intenso para acentos
-
-    final Size screenSize = MediaQuery.of(context).size;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [backgroundColor, secondaryColor],
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+            colors: [
+              Color(0xFFFFE5D0),
+              AppColors.background,
+            ],
           ),
         ),
         child: SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 80),
-                // Logo con animaciones
-                AnimatedBuilder(
-                  animation: _animationController,
-                  builder: (context, child) {
-                    return FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: ScaleTransition(
-                        scale: _scaleAnimation,
-                        child: child,
+                const Spacer(),
+
+                // Logo con animación más elaborada
+                FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: ScaleTransition(
+                    scale: _scaleAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: Image.asset(
+                        'assets/logo.png',
+                        width: 200,
+                        height: 200,
                       ),
-                    );
-                  },
-                  child: Container(
-                    width: 180,
-                    height: 180,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: primaryColor.withOpacity(0.5),
-                          blurRadius: 20,
-                          spreadRadius: 5,
-                        ),
-                      ],
-                    ),
-                    child: Hero(
-                      tag: 'app_logo',
-                      child: Image.asset('assets/logo.png'),
                     ),
                   ),
                 ),
-                
-                const SizedBox(height: 30),
-                
-                // Título de la aplicación
-                AnimatedBuilder(
-                  animation: _animationController,
-                  builder: (context, child) {
-                    return FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: child,
-                    );
-                  },
-                  child: Text(
-                    'Donaciones Beni',
-                    style: TextStyle(
-                      color: Colors.deepOrange.shade700,
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                    ),
+
+                const SizedBox(height: 10),
+                const Text(
+                  'TraceGive',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                   ),
                 ),
-                
-                const SizedBox(height: 15),
-                
-                // Texto descriptivo
-                AnimatedBuilder(
-                  animation: _animationController,
-                  builder: (context, child) {
-                    return FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: child,
-                    );
-                  },
-                  child: Text(
-                    'Sistema de transparencia en donaciones',
-                    style: TextStyle(
-                      color: Colors.deepOrange.shade700,
-                      fontSize: 16,
-                      fontStyle: FontStyle.italic,
-                    ),
-                    textAlign: TextAlign.center,
+                const SizedBox(height: 8),
+                const Text(
+                  'Transparencia en cada donación',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.textSecondary,
                   ),
                 ),
-                
-                const SizedBox(height: 40),
-                
-                // Puntos de descripción
+                const SizedBox(height: 45),
+
                 Container(
-                  width: screenSize.width * 0.8,
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  width: screenWidth * 0.6,
+                  height: 6,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: primaryColor.withOpacity(0.5), width: 1.5),
+                    borderRadius: BorderRadius.circular(10),
+                    color: AppColors.cardBackground,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: List.generate(_featurePoints.length, (index) {
-                      return AnimatedOpacity(
-                        opacity: _pointsVisible[index] ? 1.0 : 0.0,
-                        duration: Duration(milliseconds: 300),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.check_circle,
-                                color: accentColor,
-                                size: 22,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                _featurePoints[index],
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.deepOrange.shade800,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: (screenWidth * 0.6) * _progressValue,
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [AppColors.primary, AppColors.success],
                           ),
-                        ),
-                      );
-                    }),
-                  ),
-                ),
-                
-                const SizedBox(height: 40),
-                
-                // Indicador de carga más elaborado
-                Column(
-                  children: [
-                    // Barra de progreso lineal
-                    Container(
-                      width: screenSize.width * 0.7,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: LinearProgressIndicator(
-                          value: _progressValue,
-                          backgroundColor: secondaryColor,
-                          valueColor: AlwaysStoppedAnimation<Color>(accentColor),
-                          minHeight: 10,
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
                       ),
-                    ),
-                    
-                    SizedBox(height: 10),
-                    
-                    // Texto de carga con animación
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(accentColor),
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          'Cargando ${(_progressValue * 100).toInt()}%',
-                          style: TextStyle(
-                            color: Colors.deepOrange.shade700,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                    
-                    // Texto adicional animado
-                    SizedBox(height: 8),
-                    TweenAnimationBuilder<double>(
-                      tween: Tween<double>(begin: 0.0, end: 1.0),
-                      duration: Duration(seconds: 1),
-                      builder: (context, value, child) {
-                        return Opacity(
-                          opacity: value,
-                          child: Text(
-                            'Preparando todo para ti...',
-                            style: TextStyle(
-                              color: accentColor,
-                              fontSize: 14,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _currentText,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+                AnimatedFeatureBlock(
+                  title: 'Transparencia Total',
+                  description: 'Ve exactamente cómo se utiliza cada donación\ncon reportes detallados y comprobantes',
+                  animation: _featureAnimations[0],
+                  opacity: _featureOpacities[0],
+                ),
+                const SizedBox(height: 16),
+                AnimatedFeatureBlock(
+                  title: 'Seguimiento en Tiempo Real',
+                  description: 'Rastrea el progreso de las campañas y el impacto\nde tus contribuciones',
+                  animation: _featureAnimations[1],
+                  opacity: _featureOpacities[1],
+                ),
+                const SizedBox(height: 16),
+                AnimatedFeatureBlock(
+                  title: 'Donaciones Seguras',
+                  description: 'Plataforma confiable que garantiza que tu ayuda\nllegue a quien más lo necesita',
+                  animation: _featureAnimations[2],
+                  opacity: _featureOpacities[2],
+                ),
+                const SizedBox(height: 30),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: const [
+                    _PillLabel(text: 'Transparente'),
+                    _PillLabel(text: 'Seguro'),
+                    _PillLabel(text: 'Confiable'),
                   ],
                 ),
-                
-                // Nota de versión en la parte inferior
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 20.0),
-                      child: AnimatedOpacity(
-                        opacity: _progressValue > 0.7 ? 1.0 : 0.0,
-                        duration: Duration(milliseconds: 500),
-                        child: Text(
-                          'v1.0.0',
-                          style: TextStyle(
-                            color: Colors.deepOrange.shade700.withOpacity(0.7),
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                const Spacer(),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class AnimatedFeatureBlock extends StatelessWidget {
+  final String title;
+  final String description;
+  final Animation<Offset> animation;
+  final Animation<double> opacity;
+
+  const AnimatedFeatureBlock({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.animation,
+    required this.opacity,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: opacity,
+      child: SlideTransition(
+        position: animation,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              description,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PillLabel extends StatelessWidget {
+  final String text;
+  const _PillLabel({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 255, 221, 190),
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.check, size: 16, color: AppColors.success),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 12.5,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:donaciones_movil/controllers/campania_controller.dart';
+import 'package:donaciones_movil/controllers/donacion_controller.dart';
 import 'package:donaciones_movil/controllers/user_controller.dart';
 import 'package:donaciones_movil/models/campania.dart';
 import 'package:donaciones_movil/models/usuario.dart';
@@ -12,6 +13,7 @@ Widget buildCampaniasLista(
 ) {
   final campaniaController = context.watch<CampaniaController>();
   final userController = context.watch<UserController>();
+  final donacionController = context.read<DonacionController>();
 
   if (campaniaController.isLoading || userController.isLoading) {
     return const Center(child: CircularProgressIndicator());
@@ -53,26 +55,50 @@ Widget buildCampaniasLista(
     );
   }
 
-  // Crear un mapa de usuarios por ID para acceso rápido
   final Map<int, Usuario> usuariosMap = {
-  for (Usuario u in userController.usuarios ?? []) u.usuarioId: u
-};
+    for (Usuario u in userController.usuarios ?? []) u.usuarioId: u
+  };
 
-
-  // Ordenar por monto recaudado y tomar las 3 con más fondos
   final destacadas = List<Campania>.from(campanias)
     ..sort((a, b) => (b.montoRecaudado ?? 0).compareTo(a.montoRecaudado ?? 0));
 
-  final top3 = destacadas.take(3).toList();
+  final top4 = destacadas.take(4).toList();
 
-  return ListView.builder(
-    padding: EdgeInsets.zero,
-    itemCount: top3.length,
+  return GridView.builder(
+    physics: const NeverScrollableScrollPhysics(), // Evita scroll interno
+    shrinkWrap: true,
+    padding: const EdgeInsets.only(top: 8),
+    itemCount: top4.length,
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2,
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 16,
+      childAspectRatio: 0.68, // Ajusta el alto/forma de la tarjeta
+    ),
     itemBuilder: (context, index) {
-      return buildCampaniaCard(
-        context,
-        top3[index],
-        usuariosMap,
+      final campania = top4[index];
+      return FutureBuilder<int>(
+        future: donacionController.getCantidadDonantes(campania.campaniaId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: SizedBox(
+                width: 40,
+                height: 40,
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          final cantidadDonantes = snapshot.data ?? 0;
+
+          return buildCampaniaCard(
+            context,
+            campania,
+            usuariosMap,
+            cantidadDonantes,//
+          );
+        },
       );
     },
   );

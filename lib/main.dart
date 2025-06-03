@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
         title: 'Donaciones App',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 243, 201, 172)),
           useMaterial3: true,
         ),
         home: const SplashPage(nextScreen: LoginPage()),

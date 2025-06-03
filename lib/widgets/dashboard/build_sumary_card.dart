@@ -1,4 +1,3 @@
-import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
 import 'package:donaciones_movil/controllers/donacion_controller.dart';
 import 'package:donaciones_movil/controllers/saldos_donacion_controller.dart';
 import 'package:donaciones_movil/controllers/asignacion_controller.dart';
@@ -10,28 +9,21 @@ Widget buildSummaryCards(BuildContext context) {
   final donacionController = context.watch<DonacionController>();
   final saldosController = context.watch<SaldosDonacionController>();
   final asignacionController = context.watch<AsignacionController>();
-  final authController = context.watch<AuthController>();
 
-  // ✅ Donaciones globales
   final todasDonaciones = donacionController.todasDonaciones ?? [];
-
-  // ✅ Asignaciones globales
   final todasAsignaciones = asignacionController.asignaciones ?? [];
+  final donacionesUsuario = donacionController.donaciones ?? [];
 
-  // ✅ Total donado por todos los usuarios
   final totalDonado = todasDonaciones.fold<double>(
     0,
     (sum, donacion) => sum + donacion.monto,
   );
 
-  // ✅ Total utilizado (fondos asignados)
   final totalUtilizado = todasAsignaciones.fold<double>(
     0,
     (sum, asignacion) => sum + asignacion.monto,
   );
 
-  // ✅ Cantidad de donaciones del usuario actual
-  final donacionesUsuario = donacionController.donaciones ?? [];
   final totalDonacionesUsuario = donacionesUsuario.length;
 
   return Column(
@@ -40,93 +32,122 @@ Widget buildSummaryCards(BuildContext context) {
         children: [
           Expanded(
             child: buildSummaryCard(
-              context,
-              icon: Icons.account_balance_wallet,
+              icon: Icons.monetization_on_rounded,
               title: 'Total Donado',
               value: currencyFormatter.format(totalDonado),
-              color: Colors.green,
+              tagText: '+12% este mes',
+              iconColor: const Color(0xFFF58C5B),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
             child: buildSummaryCard(
-              context,
-              icon: Icons.payments,
+              icon: Icons.payments_outlined,
               title: 'Fondos Utilizados',
               value: currencyFormatter.format(totalUtilizado),
-              color: Colors.purple,
+              tagText: '+2 nuevas',
+              iconColor: const Color(0xFF7E57C2),
             ),
           ),
         ],
       ),
-      const SizedBox(height: 16),
+      const SizedBox(height: 12),
       SizedBox(
         width: double.infinity,
         child: buildSummaryCard(
-          context,
-          icon: Icons.volunteer_activism,
+          icon: Icons.volunteer_activism_rounded,
           title: 'Donaciones',
           value: '$totalDonacionesUsuario',
-          color: Colors.blue,
+          tagText: 'Gracias por tu apoyo',
+          iconColor: const Color(0xFF42A5F5),
+          backgroundImage: 'assets/donaciones.png', // <- solo aquí se pasa la imagen
         ),
       ),
     ],
   );
 }
 
-Widget buildSummaryCard(
-  BuildContext context, {
+Widget buildSummaryCard({
   required IconData icon,
   required String title,
   required String value,
-  required Color color,
+  required String tagText,
+  required Color iconColor,
+  String? backgroundImage, // <- nueva propiedad opcional
 }) {
-  return Card(
-    elevation: 4,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
+  return Material(
+  elevation: 3,
+  borderRadius: BorderRadius.circular(16),
+  color: Colors.transparent,
+  child: Container(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black12.withOpacity(0.05),
+          blurRadius: 6,
+          offset: const Offset(0, 2),
+        ),
+      ],
     ),
-    child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            color.withOpacity(0.8),
-            color,
+    padding: const EdgeInsets.all(16),
+    child: Stack(
+      children: [
+        if (backgroundImage != null)
+          Positioned(
+            right: 0,
+            top: 0,
+            bottom: 0,
+            child: Opacity(
+              opacity: 1,
+              child: Image.asset(
+                backgroundImage,
+                height: 100,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              backgroundColor: Colors.white,
+              radius: 24,
+              child: Icon(icon, color: iconColor, size: 24),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: iconColor,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF2F2F2F),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              tagText,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Colors.green,
+              ),
+            ),
           ],
         ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            icon,
-            size: 32,
-            color: Colors.white,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white.withOpacity(0.9),
-            ),
-          ),
-        ],
-      ),
+      ],
     ),
-  );
+  ),
+);
+
 }

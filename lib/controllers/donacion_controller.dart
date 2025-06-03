@@ -66,6 +66,15 @@ class DonacionController extends ChangeNotifier {
     }
   }
 
+  Future<int> getCantidadDonantes(int campaniaId) async {
+    try {
+      return await _donacionService.getCantidadDonantesPorCampania(campaniaId);
+    } catch (e) {
+      _error = 'Error al contar donantes: ${e.toString()}';
+      return 0;
+    }
+  }
+
   // Cargar donación por ID
   Future<void> loadDonacion(int id) async {
     _isLoading = true;

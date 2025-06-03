@@ -42,4 +42,9 @@ class DonacionService {
     final data = await _apiService.get('${ApiConstants.donacionEndpoint}/usuario/$usuarioId');
     return (data as List).map((item) => Donacion.fromJson(item)).toList();
   }
+
+  Future<int> getCantidadDonantesPorCampania(int campaniaId) async {
+    final data = await _apiService.get('${ApiConstants.campaniaDonantesCountEndpoint}/$campaniaId/donantes-count');
+    return data as int;
+  }
 }
