@@ -129,21 +129,6 @@ class CampaniaCard extends StatelessWidget {
                             color: Colors.black,
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFE0F2F1), // verde pastel
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Text(
-                            'ACTIVA',
-                            style: TextStyle(
-                              color: Color(0xFF2E7D32),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ],

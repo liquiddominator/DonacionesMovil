@@ -6,6 +6,7 @@ import 'package:donaciones_movil/models/donacion.dart';
 import 'package:donaciones_movil/models/saldos_donacion.dart';
 import 'package:donaciones_movil/utils/currency_format.dart';
 import 'package:donaciones_movil/widgets/donaciones/feedback_dialog.dart';
+import 'package:donaciones_movil/widgets/navegacion/main_navigation_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -72,6 +73,7 @@ class ConfirmarDonacionPage extends StatelessWidget {
         metaRecaudacion: campania.metaRecaudacion,
         montoRecaudado: (campania.montoRecaudado ?? 0) + donacion.monto,
         usuarioIdcreador: campania.usuarioIdcreador,
+        imagenUrl: campania.imagenUrl,
         activa: campania.activa ?? true,
         fechaCreacion: campania.fechaCreacion ?? DateTime.now(),
       );
@@ -98,8 +100,13 @@ class ConfirmarDonacionPage extends StatelessWidget {
     }
 
     if (context.mounted) {
-      Navigator.popUntil(context, (route) => route.isFirst);
-    }
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (_) => const MainNavigationPage()),
+    (route) => false, // elimina todas las rutas anteriores
+  );
+}
+
   } else {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

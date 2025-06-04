@@ -113,9 +113,14 @@ class AuthController extends ChangeNotifier {
       await _loadUserRoles(_currentUser!.usuarioId);
     }
 
-    _isLoading = false;
-    notifyListeners();
-    return true;
+    if (_currentUser != null) {
+  setCurrentUser(_currentUser!); // <- Esto asegura la persistencia en el árbol de widgets
+}
+
+_isLoading = false;
+notifyListeners();
+return true;
+
   } catch (e) {
     _error = e.toString();
     _isLoading = false;

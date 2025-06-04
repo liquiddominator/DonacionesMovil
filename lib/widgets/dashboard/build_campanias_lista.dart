@@ -6,7 +6,7 @@ import 'package:donaciones_movil/models/usuario.dart';
 import 'package:donaciones_movil/widgets/dashboard/build_campania_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+ 
 Widget buildCampaniasLista(
   BuildContext context,
   VoidCallback onRefresh,
@@ -14,11 +14,11 @@ Widget buildCampaniasLista(
   final campaniaController = context.watch<CampaniaController>();
   final userController = context.watch<UserController>();
   final donacionController = context.read<DonacionController>();
-
+ 
   if (campaniaController.isLoading || userController.isLoading) {
     return const Center(child: CircularProgressIndicator());
   }
-
+ 
   if (campaniaController.error != null) {
     return Center(
       child: Column(
@@ -36,9 +36,9 @@ Widget buildCampaniasLista(
       ),
     );
   }
-
+ 
   final campanias = campaniaController.campanias ?? [];
-
+ 
   if (campanias.isEmpty) {
     return const Center(
       child: Column(
@@ -54,16 +54,16 @@ Widget buildCampaniasLista(
       ),
     );
   }
-
+ 
   final Map<int, Usuario> usuariosMap = {
     for (Usuario u in userController.usuarios ?? []) u.usuarioId: u
   };
-
+ 
   final destacadas = List<Campania>.from(campanias)
     ..sort((a, b) => (b.montoRecaudado ?? 0).compareTo(a.montoRecaudado ?? 0));
-
+ 
   final top4 = destacadas.take(4).toList();
-
+ 
   return GridView.builder(
     physics: const NeverScrollableScrollPhysics(), // Evita scroll interno
     shrinkWrap: true,
@@ -73,7 +73,7 @@ Widget buildCampaniasLista(
       crossAxisCount: 2,
       crossAxisSpacing: 12,
       mainAxisSpacing: 16,
-      childAspectRatio: 0.68, // Ajusta el alto/forma de la tarjeta
+      childAspectRatio: 0.63, // Ajusta el alto/forma de la tarjeta
     ),
     itemBuilder: (context, index) {
       final campania = top4[index];
@@ -89,14 +89,14 @@ Widget buildCampaniasLista(
               ),
             );
           }
-
+ 
           final cantidadDonantes = snapshot.data ?? 0;
-
+ 
           return buildCampaniaCard(
             context,
             campania,
             usuariosMap,
-            cantidadDonantes,//
+            cantidadDonantes,
           );
         },
       );

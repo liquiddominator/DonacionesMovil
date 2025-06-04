@@ -9,6 +9,9 @@ import 'package:flutter/material.dart';
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({Key? key}) : super(key: key);
 
+  static _MainNavigationScreenState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_MainNavigationScreenState>();
+
   @override
   State<MainNavigationPage> createState() => _MainNavigationScreenState();
 }
@@ -51,6 +54,13 @@ class _MainNavigationScreenState extends State<MainNavigationPage>
     'Mensajería',
     'Perfil',
   ];
+
+  void changeTab(int index) {
+    _animationControllers[_selectedIndex].reverse();
+    _selectedIndex = index;
+    _animationControllers[_selectedIndex].forward();
+    setState(() {});
+  }
 
   @override
   void initState() {

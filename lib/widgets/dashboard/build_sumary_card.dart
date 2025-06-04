@@ -24,7 +24,7 @@ Widget buildSummaryCards(BuildContext context) {
     (sum, asignacion) => sum + asignacion.monto,
   );
 
-  final totalDonacionesUsuario = donacionesUsuario.length;
+  final totalDonacionesGlobal = todasDonaciones.length;
 
   return Column(
     children: [
@@ -43,7 +43,7 @@ Widget buildSummaryCards(BuildContext context) {
           Expanded(
             child: buildSummaryCard(
               icon: Icons.payments_outlined,
-              title: 'Fondos Utilizados',
+              title: 'Fondos Usados',
               value: currencyFormatter.format(totalUtilizado),
               tagText: '+2 nuevas',
               iconColor: const Color(0xFF7E57C2),
@@ -57,10 +57,10 @@ Widget buildSummaryCards(BuildContext context) {
         child: buildSummaryCard(
           icon: Icons.volunteer_activism_rounded,
           title: 'Donaciones',
-          value: '$totalDonacionesUsuario',
-          tagText: 'Gracias por tu apoyo',
+          value: '$totalDonacionesGlobal',
+          tagText: 'Apoyo de todos',
           iconColor: const Color(0xFF42A5F5),
-          backgroundImage: 'assets/donaciones.png', // <- solo aquí se pasa la imagen
+          backgroundImage: 'assets/donaciones.png',
         ),
       ),
     ],

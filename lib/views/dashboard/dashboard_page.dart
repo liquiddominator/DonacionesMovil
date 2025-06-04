@@ -7,6 +7,7 @@ import 'package:donaciones_movil/views/perfil/perfil_usuario_page.dart';
 import 'package:donaciones_movil/widgets/dashboard/build_campanias_lista.dart';
 import 'package:donaciones_movil/controllers/asignacion_controller.dart';
 import 'package:donaciones_movil/widgets/dashboard/build_sumary_card.dart';
+import 'package:donaciones_movil/widgets/navegacion/main_navigation_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
@@ -150,10 +151,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (_) => const PerfilUsuarioPage()),
-                                  );
+                                  MainNavigationPage.of(context)?.changeTab(4); // índice del tab "Perfil"
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.all(2),

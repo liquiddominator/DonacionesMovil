@@ -1,3 +1,4 @@
+import 'package:donaciones_movil/widgets/navegacion/main_navigation_page.dart';
 import 'package:flutter/material.dart';
 import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
 import 'package:donaciones_movil/models/rol.dart';
@@ -184,11 +185,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                               newUsuario, _selectedRolId!);
 
                                           if (success && context.mounted) {
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(builder: (_) => const LoginPage()),
-                                            );
-                                          }
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (_) => const MainNavigationPage()),
+  );
+}
+
                                         }
                                       },
                                 style: ElevatedButton.styleFrom(
