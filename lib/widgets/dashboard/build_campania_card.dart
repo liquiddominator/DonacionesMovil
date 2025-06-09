@@ -30,21 +30,27 @@ Widget buildCampaniaCard(
         ),
       );
     },
-    child: Card(
-      color: Colors.white,
-      elevation: 2,
-      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-      shape: RoundedRectangleBorder(
+    child: Container(
+      margin: const EdgeInsets.symmetric(vertical: 15, horizontal: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Imagen superior (ampliada)
+          // Imagen superior
           ClipRRect(
             borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(14),
-              topRight: Radius.circular(14),
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
             ),
             child: SizedBox(
               height: 120,
@@ -73,7 +79,7 @@ Widget buildCampaniaCard(
 
           // Contenido
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -91,7 +97,7 @@ Widget buildCampaniaCard(
 
                 const SizedBox(height: 4),
 
-                // Email del creador (si existe)
+                // Email del creador
                 if (creador != null)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 6),
@@ -105,19 +111,7 @@ Widget buildCampaniaCard(
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-
-                // Monto recaudado
-                Text(
-                  '${currencyFormatter.format(campania.montoRecaudado ?? 0)} de ${currencyFormatter.format(campania.metaRecaudacion)}',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Colors.black54,
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                // Barra de progreso con porcentaje
+                // Progreso
                 Row(
                   children: [
                     Expanded(
@@ -150,8 +144,7 @@ Widget buildCampaniaCard(
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.people,
-                            size: 14, color: Colors.black45),
+                        const Icon(Icons.people, size: 14, color: Colors.black45),
                         const SizedBox(width: 4),
                         Text(
                           '$cantidadDonantes',

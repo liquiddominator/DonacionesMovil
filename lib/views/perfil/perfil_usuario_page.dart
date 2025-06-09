@@ -1,13 +1,17 @@
-import 'dart:typed_data';
 import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
 import 'package:donaciones_movil/controllers/user_controller.dart';
 import 'package:donaciones_movil/models/usuario.dart';
 import 'package:donaciones_movil/views/auth/login_page.dart';
+import 'package:donaciones_movil/widgets/navegacion/main_navigation_page.dart';
+import 'package:donaciones_movil/widgets/perfil/dialogo_cerrar_sesion.dart';
+import 'package:donaciones_movil/widgets/perfil/personal_info_card.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class PerfilUsuarioPage extends StatefulWidget {
   const PerfilUsuarioPage({super.key});
@@ -72,8 +76,8 @@ class _PerfilUsuarioPageState extends State<PerfilUsuarioPage> {
             authController.setCurrentUser(updatedUser);
           }
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Información actualizada con éxito'),
+            const SnackBar(
+              content: Text('Información actualizada con éxito'),
               backgroundColor: Colors.green,
             ),
           );
@@ -125,7 +129,7 @@ class _PerfilUsuarioPageState extends State<PerfilUsuarioPage> {
 
         setState(() {});
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: const Text('Imagen actualizada'), backgroundColor: Colors.green),
+          const SnackBar(content: Text('Imagen actualizada'), backgroundColor: Colors.green),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -137,200 +141,313 @@ class _PerfilUsuarioPageState extends State<PerfilUsuarioPage> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final authController = Provider.of<AuthController>(context);
-    final user = authController.currentUser;
-    if (user == null) {
-      Future.microtask(() {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const LoginPage()),
-          (route) => false,
+  void _mostrarOpcionesImagen() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo),
+                title: const Text('Cambiar foto'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _seleccionarYSubirImagen();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.remove_red_eye),
+                title: const Text('Ver foto'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _verImagenCompleta();
+                },
+              ),
+            ],
+          ),
         );
-      });
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      },
+    );
+  }
+
+  void _verImagenCompleta() {
+    final user = Provider.of<AuthController>(context, listen: false).currentUser!;
+    if (user.imagenUrl == null || user.imagenUrl!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No hay imagen para mostrar')),
+      );
+      return;
     }
 
-    final theme = Theme.of(context);
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text('Perfil de Usuario'),
-        centerTitle: true,
-        elevation: 0,
-        actions: [
-          _isLoading
-              ? const Padding(
-                  padding: EdgeInsets.only(right: 16.0),
-                  child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
-                )
-              : IconButton(
-                  icon: Icon(_editMode ? Icons.close : Icons.edit),
-                  tooltip: _editMode ? 'Cancelar edición' : 'Editar perfil',
-                  onPressed: () => setState(() => _editMode = !_editMode),
-                ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.only(bottom: 24),
-              decoration: BoxDecoration(
-                color: theme.primaryColor,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30),
-                ),
-              ),
-              child: SafeArea(
-                child: Center(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20),
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Colors.white,
-                            backgroundImage: user.imagenUrl != null && user.imagenUrl!.isNotEmpty
-                                ? NetworkImage(user.imagenUrl!)
-                                : null,
-                            child: (user.imagenUrl == null || user.imagenUrl!.isEmpty)
-                                ? Text(
-                                    '${user.nombre[0]}${user.apellido[0]}',
-                                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: theme.primaryColor),
-                                  )
-                                : null,
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: GestureDetector(
-                              onTap: _isLoading ? null : _seleccionarYSubirImagen,
-                              child: Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                                child: const Icon(Icons.edit, size: 20, color: Colors.black),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Text('${user.nombre} ${user.apellido}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-                      const SizedBox(height: 4),
-                      Text(user.email, style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.8))),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Información Personal', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: theme.primaryColor)),
-                    const SizedBox(height: 20),
-                    _buildTextField(controller: _nombreController, label: 'Nombre', icon: Icons.person_outline, enabled: _editMode, validator: (value) => value!.isEmpty ? 'Campo requerido' : null),
-                    const SizedBox(height: 20),
-                    _buildTextField(controller: _apellidoController, label: 'Apellido', icon: Icons.person_outline, enabled: _editMode, validator: (value) => value!.isEmpty ? 'Campo requerido' : null),
-                    const SizedBox(height: 20),
-                    _buildTextField(controller: _emailController, label: 'Correo electrónico', icon: Icons.email_outlined, enabled: _editMode, validator: (value) => !value!.contains('@') ? 'Correo inválido' : null, keyboardType: TextInputType.emailAddress),
-                    const SizedBox(height: 20),
-                    _buildTextField(controller: _telefonoController, label: 'Teléfono', icon: Icons.phone_outlined, enabled: _editMode, keyboardType: TextInputType.phone),
-                    if (_editMode) ...[
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.save),
-                          label: const Text('GUARDAR CAMBIOS'),
-                          style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 15), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                          onPressed: _isLoading ? null : () => _guardarCambios(user),
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 30),
-                    Text('Opciones', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: theme.primaryColor)),
-                    const SizedBox(height: 16),
-                    _buildOptionTile(icon: Icons.logout, title: 'Cerrar sesión', onTap: () => _mostrarDialogoCerrarSesion(context), textColor: Colors.red, iconColor: Colors.red),
-                  ],
-                ),
-              ),
-            ),
-          ],
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        insetPadding: const EdgeInsets.all(20),
+        child: InteractiveViewer(
+          child: Image.network(user.imagenUrl!),
         ),
       ),
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    bool enabled = true,
-    String? Function(String?)? validator,
-    TextInputType? keyboardType,
-  }) {
-    return TextFormField(
-      controller: controller,
-      validator: validator,
-      enabled: enabled,
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon),
-        filled: !enabled,
-        fillColor: enabled ? null : Colors.grey.shade100,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey.shade400)),
-        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).primaryColor)),
+  Widget _donacionItem(IconData icon, String texto, Color colorIcono) {
+  return ListTile(
+    leading: CircleAvatar(
+      backgroundColor: colorIcono,
+      child: Icon(icon, color: Colors.white),
+    ),
+    title: Text(texto),
+    trailing: const Icon(Icons.chevron_right),
+    onTap: () {}, // Aquí puedes añadir navegación luego
+  );
+}
+
+
+  @override
+Widget build(BuildContext context) {
+  final authController = Provider.of<AuthController>(context);
+  final user = authController.currentUser;
+  if (user == null) {
+    Future.microtask(() {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+        (route) => false,
+      );
+    });
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+  }
+
+  final theme = Theme.of(context);
+
+  return AnnotatedRegion<SystemUiOverlayStyle>(
+    value: SystemUiOverlayStyle.light.copyWith(
+      statusBarColor: const Color(0xFFF58C5B),
+      statusBarIconBrightness: Brightness.light,
+    ),
+    child: Scaffold(
+      backgroundColor: const Color(0xFFFFF6F0),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // HEADER estilo BandejaEntrada pero sin back button
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(16, 40, 16, 24),
+              decoration: const BoxDecoration(
+                color: Color(0xFFF58C5B),
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+              ),
+              child: Stack(
+  children: [
+    Positioned(
+      top: 0,
+      right: 0,
+      child: IconButton(
+        icon: Icon(_editMode ? Icons.close : Icons.edit, color: Colors.white),
+        tooltip: _editMode ? 'Cancelar edición' : 'Editar perfil',
+        onPressed: () => setState(() => _editMode = !_editMode),
       ),
-    );
-  }
-
-  Widget _buildOptionTile({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-    Color? textColor,
-    Color? iconColor,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: iconColor ?? Theme.of(context).primaryColor),
-      title: Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: textColor)),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-      onTap: onTap,
-    );
-  }
-
-  void _mostrarDialogoCerrarSesion(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Cerrar sesión'),
-        content: const Text('¿Estás seguro que deseas cerrar tu sesión?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCELAR')),
-          ElevatedButton(
-            onPressed: () {
-              context.read<AuthController>().logout();
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-                (route) => false,
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('CERRAR SESIÓN'),
+    ),
+    Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: _isLoading ? null : _mostrarOpcionesImagen,
+            child: CircleAvatar(
+              radius: 56,
+              backgroundColor: Colors.white,
+              backgroundImage: user.imagenUrl != null && user.imagenUrl!.isNotEmpty
+                  ? NetworkImage(user.imagenUrl!)
+                  : null,
+              child: (user.imagenUrl == null || user.imagenUrl!.isEmpty)
+                  ? Text(
+                      '${user.nombre[0]}${user.apellido[0]}',
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFF58C5B),
+                      ),
+                    )
+                  : null,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            '${user.nombre} ${user.apellido}',
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Text(
+              user.email,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ],
       ),
-    );
-  }
+    ),
+  ],
+),
+
+            ),
+
+
+            // CONTENIDO
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  PersonalInfoCard(
+                    user: user,
+                    editMode: _editMode,
+                    isLoading: _isLoading,
+                    onSave: () => _guardarCambios(user),
+                    nombreController: _nombreController,
+                    apellidoController: _apellidoController,
+                    emailController: _emailController,
+                    telefonoController: _telefonoController,
+                    formKey: _formKey,
+                  ),
+                  const SizedBox(height: 30),
+                  Container(
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(16),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black12,
+        blurRadius: 8,
+        offset: Offset(0, 3),
+      ),
+    ],
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Encabezado
+      Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFFFFE0CB),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            const Icon(Icons.favorite, color: Colors.red),
+            const SizedBox(width: 8),
+            const Text(
+              'Mis Donaciones',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+            ),
+          ],
+        ),
+      ),
+      // Items
+      Column(
+        children: [
+          ListTile(
+  leading: const CircleAvatar(
+    backgroundColor: Color(0xFFFFB72B),
+    child: Icon(Icons.savings, color: Colors.white),
+  ),
+  title: const Text('Historial de Donaciones'),
+  trailing: const Icon(Icons.chevron_right),
+  onTap: () {
+    MainNavigationPage.of(context)?.changeTab(2);
+  },
+),
+        ],
+      ),
+    ],
+  ),
+),
+const SizedBox(height: 30),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.transparent,
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFFE0CB),
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          child: Row(
+                            children: const [
+                              Icon(Icons.settings, color: Colors.black87),
+                              SizedBox(width: 8),
+                              Text(
+                                'Configuración',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(10)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 8,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: const Color(0xFFF58C5B),
+                              child: const Icon(Icons.door_back_door_outlined, color: Colors.white),
+                            ),
+                            title: const Text(
+                              'Cerrar Sesión',
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                            onTap: () => mostrarDialogoCerrarSesion(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 }

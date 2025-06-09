@@ -21,22 +21,30 @@ class CampaniaCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final progress = (campania.montoRecaudado ?? 0) / campania.metaRecaudacion;
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 15),
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DetalleCampaniaPage(campania: campania),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetalleCampaniaPage(campania: campania),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 5,
+              offset: const Offset(0, 3),
             ),
-          );
-        },
+          ],
+        ),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(14),
           child: Row(
             children: [
               // Imagen o ícono con fondo degradado
@@ -44,11 +52,7 @@ class CampaniaCard extends StatelessWidget {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFFFE0B2), Color(0xFFFFCCBC)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: const Color(0xFFFFE5D4),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: campania.imagenUrl != null && campania.imagenUrl!.isNotEmpty
@@ -75,7 +79,7 @@ class CampaniaCard extends StatelessWidget {
                     Text(
                       campania.titulo,
                       style: const TextStyle(
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.bold,
                         fontSize: 15.5,
                         color: Color(0xFF2F2F2F),
                       ),
@@ -95,41 +99,24 @@ class CampaniaCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
 
                     // Barra de progreso
-                    LinearPercentIndicator(
-                      lineHeight: 6,
-                      percent: progress.clamp(0.0, 1.0),
-                      backgroundColor: const Color(0xFFF0F0F0),
-                      progressColor: const Color.fromARGB(255, 246, 161, 116), // verde suave
-                      barRadius: const Radius.circular(4),
-                      padding: EdgeInsets.zero,
-                      animation: true,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: LinearProgressIndicator(
+                        value: progress.clamp(0.0, 1.0),
+                        backgroundColor: const Color(0xFFF0F0F0),
+                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFF58C5B)),
+                        minHeight: 6,
+                      ),
                     ),
                     const SizedBox(height: 6),
 
-                    // % completado
+                    // Porcentaje completado
                     Text(
                       '${(progress * 100).clamp(0, 100).toStringAsFixed(0)}% completado',
                       style: const TextStyle(fontSize: 12.5, color: Colors.black87),
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    // Recaudado vs Meta + Estado
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Bs ${currencyFormat.format(campania.montoRecaudado ?? 0)} / Bs ${currencyFormat.format(campania.metaRecaudacion)}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),

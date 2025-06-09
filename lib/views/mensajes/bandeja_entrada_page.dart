@@ -7,6 +7,7 @@ import 'package:donaciones_movil/models/mensaje.dart';
 import 'package:donaciones_movil/models/respuesta_mensaje.dart';
 import 'package:donaciones_movil/models/usuario.dart';
 import 'package:donaciones_movil/views/mensajes/chat_admin_page.dart';
+import 'package:donaciones_movil/widgets/mensajes/bandeja_mensaje_unico.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,31 +21,35 @@ class BandejaEntradaPage extends StatefulWidget {
 class _BandejaEntradaPageState extends State<BandejaEntradaPage> {
   List<Usuario> _admins = [];
 
+  Future<void> _refreshData() async {
+    final auth = context.read<AuthController>();
+    final mensajeController = context.read<MensajeController>();
+    final respuestaController = context.read<RespuestaMensajeController>();
+    final usuarioRolController = context.read<UsuarioRolController>();
+    final usuarioController = context.read<UserController>();
+
+    await mensajeController.loadMensajesByUsuario(auth.currentUser!.usuarioId);
+    await respuestaController.loadRespuestas();
+    await usuarioRolController.loadUsuariosByRolId(1);
+
+    final relacionesAdmin = usuarioRolController.usuariosRoles ?? [];
+    final usuarios = <Usuario>[];
+
+    for (var rel in relacionesAdmin) {
+      final user = await usuarioController.getUsuarioById(rel.usuarioId);
+      usuarios.add(user);
+    }
+
+    setState(() {
+      _admins = usuarios;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     Future.microtask(() async {
-      final auth = Provider.of<AuthController>(context, listen: false);
-      final mensajeController = Provider.of<MensajeController>(context, listen: false);
-      final respuestaController = Provider.of<RespuestaMensajeController>(context, listen: false);
-      final usuarioRolController = Provider.of<UsuarioRolController>(context, listen: false);
-      final usuarioController = Provider.of<UserController>(context, listen: false);
-
-      await mensajeController.loadMensajesByUsuario(auth.currentUser!.usuarioId);
-      await respuestaController.loadRespuestas();
-      await usuarioRolController.loadUsuariosByRolId(1);
-
-      final relacionesAdmin = usuarioRolController.usuariosRoles ?? [];
-      final usuarios = <Usuario>[];
-
-      for (var rel in relacionesAdmin) {
-        final user = await usuarioController.getUsuarioById(rel.usuarioId);
-        usuarios.add(user);
-      }
-
-      setState(() {
-        _admins = usuarios;
-      });
+      await _refreshData();
     });
   }
 
@@ -71,47 +76,101 @@ class _BandejaEntradaPageState extends State<BandejaEntradaPage> {
     final currentUserId = Provider.of<AuthController>(context, listen: false).currentUser!.usuarioId;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bandeja de Entrada'),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(70),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Autocomplete<Usuario>(
-              optionsBuilder: (TextEditingValue textEditingValue) {
-                if (textEditingValue.text.isEmpty) return const Iterable<Usuario>.empty();
-                return _admins.where((u) =>
-                    u.email.toLowerCase().contains(textEditingValue.text.toLowerCase()));
-              },
-              displayStringForOption: (Usuario option) => option.email,
-              onSelected: _abrirChatConAdmin,
-              fieldViewBuilder: (context, textController, focusNode, onFieldSubmitted) {
-                return TextField(
-                  controller: textController,
-                  focusNode: focusNode,
-                  decoration: InputDecoration(
-                    hintText: 'Buscar administrador por correo...',
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      backgroundColor: const Color(0xFFFFF6F0),
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(16, 66, 16, 20),
+            decoration: const BoxDecoration(
+              color: Color(0xFFF58C5B),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  right: -5,
+                  top: -10,
+                  child: Opacity(
+                    opacity: 1,
+                    child: Image.asset(
+                      'assets/mensaje.png',
+                      height: 150,
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                );
-              },
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Mensajes',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Conversaciones con administradores',
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                    const SizedBox(height: 16),
+                    Autocomplete<Usuario>(
+                      optionsBuilder: (TextEditingValue textEditingValue) {
+                        if (textEditingValue.text.isEmpty) return const Iterable<Usuario>.empty();
+                        return _admins.where((u) => u.email.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                      },
+                      displayStringForOption: (Usuario option) => option.email,
+                      onSelected: _abrirChatConAdmin,
+                      fieldViewBuilder: (context, textController, focusNode, onFieldSubmitted) {
+                        return TextField(
+                          controller: textController,
+                          focusNode: focusNode,
+                          decoration: InputDecoration(
+                            hintText: 'Buscar administrador por correo...',
+                            filled: true,
+                            fillColor: Colors.white,
+                            prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-        ),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: _refreshData,
+              color: const Color(0xFFF58C5B),
+              backgroundColor: const Color(0xFFFFF6F0),
+              child: mensajeController.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : (mensajeController.mensajes == null || mensajeController.mensajes!.isEmpty)
+                      ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: const [
+                            SizedBox(height: 150),
+                            Center(child: Text('No tienes mensajes.')),
+                          ],
+                        )
+                      : _buildListaConversaciones(
+                          mensajeController.mensajes!,
+                          respuestaController.respuestas ?? [],
+                          currentUserId,
+                        ),
+            ),
+          ),
+        ],
       ),
-      body: mensajeController.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : (mensajeController.mensajes == null || mensajeController.mensajes!.isEmpty)
-              ? const Center(child: Text('No tienes mensajes.'))
-              : _buildListaConversaciones(
-                  mensajeController.mensajes!,
-                  respuestaController.respuestas ?? [],
-                  currentUserId,
-                ),
     );
   }
 
@@ -130,14 +189,12 @@ class _BandejaEntradaPageState extends State<BandejaEntradaPage> {
     }
 
     for (var respuesta in respuestas) {
-      final mensajeRelacionado = mensajes.firstWhere(
-        (m) => m.mensajeId == respuesta.mensajeId,
-        orElse: () => Mensaje(mensajeId: 0, usuarioOrigen: 0, usuarioDestino: 0, asunto: '', contenido: ''),
-      );
+      final mensajeRelacionado = mensajes.where((m) => m.mensajeId == respuesta.mensajeId).firstOrNull;
+      if (mensajeRelacionado == null) continue;
 
-      if (mensajeRelacionado.mensajeId == 0) continue;
-
-      final adminId = mensajeRelacionado.usuarioDestino;
+      final adminId = mensajeRelacionado.usuarioOrigen == currentUserId
+          ? mensajeRelacionado.usuarioDestino
+          : mensajeRelacionado.usuarioOrigen;
 
       if (adminId != null) {
         chatsPorAdmin.putIfAbsent(adminId, () => []);
@@ -151,23 +208,6 @@ class _BandejaEntradaPageState extends State<BandejaEntradaPage> {
         final adminId = chatsPorAdmin.keys.elementAt(index);
         final mensajesYRespuestas = chatsPorAdmin[adminId]!;
 
-        mensajesYRespuestas.sort((a, b) {
-          final fechaA = a is Mensaje ? a.fechaEnvio ?? DateTime.now() : a.fechaRespuesta ?? DateTime.now();
-          final fechaB = b is Mensaje ? b.fechaEnvio ?? DateTime.now() : b.fechaRespuesta ?? DateTime.now();
-          return fechaB.compareTo(fechaA);
-        });
-
-        final ultimo = mensajesYRespuestas.first;
-        String texto = '';
-        bool esLeido = true;
-
-        if (ultimo is Mensaje) {
-          texto = ultimo.contenido;
-          esLeido = ultimo.leido ?? true;
-        } else if (ultimo is RespuestaMensaje) {
-          texto = ultimo.contenido;
-        }
-
         final admin = _admins.firstWhere(
           (u) => u.usuarioId == adminId,
           orElse: () => Usuario(
@@ -179,15 +219,9 @@ class _BandejaEntradaPageState extends State<BandejaEntradaPage> {
           ),
         );
 
-        return ListTile(
-          leading: Icon(
-            esLeido ? Icons.mark_email_read : Icons.mark_email_unread,
-            color: esLeido ? Colors.grey : Colors.blue,
-          ),
-          title: Text(admin.email),
-          subtitle: Text(
-            texto.length > 40 ? '${texto.substring(0, 40)}...' : texto,
-          ),
+        return ConversacionItem(
+          admin: admin,
+          mensajesYRespuestas: mensajesYRespuestas,
           onTap: () => _abrirChatConAdmin(admin),
         );
       },

@@ -76,7 +76,6 @@ Widget buildSummaryCard({
   String? backgroundImage, // <- nueva propiedad opcional
 }) {
   return Material(
-  elevation: 3,
   borderRadius: BorderRadius.circular(16),
   color: Colors.transparent,
   child: Container(
@@ -86,8 +85,8 @@ Widget buildSummaryCard({
       boxShadow: [
         BoxShadow(
           color: Colors.black12.withOpacity(0.05),
-          blurRadius: 6,
-          offset: const Offset(0, 2),
+          blurRadius: 5,
+          offset: const Offset(0, 5),
         ),
       ],
     ),
