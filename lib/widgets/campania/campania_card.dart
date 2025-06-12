@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:intl/intl.dart';
 import 'package:donaciones_movil/models/campania.dart';
 import 'package:donaciones_movil/models/usuario.dart';

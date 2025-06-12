@@ -1,6 +1,5 @@
 import 'package:donaciones_movil/models/campania.dart';
 import 'package:donaciones_movil/models/usuario.dart';
-import 'package:donaciones_movil/utils/currency_format.dart';
 import 'package:donaciones_movil/views/campanias/detalle_campania_page.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
