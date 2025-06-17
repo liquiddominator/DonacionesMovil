@@ -499,11 +499,18 @@ Widget build(BuildContext context) {
                                               BorderRadius.circular(8),
                                           child: asignacion.imagenUrl != null
                                               ? Image.network(
-                                                  asignacion.imagenUrl!,
-                                                  width: 70,
-                                                  height: 70,
-                                                  fit: BoxFit.cover,
-                                                )
+  asignacion.imagenUrl!,
+  width: 70,
+  height: 70,
+  fit: BoxFit.cover,
+  errorBuilder: (context, error, stackTrace) => Container(
+    width: 70,
+    height: 70,
+    color: Colors.grey[300],
+    child: const Icon(Icons.broken_image),
+  ),
+)
+
                                               : Container(
                                                   width: 70,
                                                   height: 70,

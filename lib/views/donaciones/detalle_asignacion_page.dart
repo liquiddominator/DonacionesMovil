@@ -260,21 +260,28 @@ class _DetalleAsignacionPageState extends State<DetalleAsignacionPage> {
                       child: Row(
                         children: [
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: d.imagenUrl != null
-                                ? Image.network(
-                                    d.imagenUrl!,
-                                    width: 50,
-                                    height: 50,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Container(
-                                    width: 50,
-                                    height: 50,
-                                    color: Colors.grey[300],
-                                    child: const Icon(Icons.image_not_supported),
-                                  ),
-                          ),
+  borderRadius: BorderRadius.circular(8),
+  child: d.imagenUrl != null
+      ? Image.network(
+          d.imagenUrl!,
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Container(
+            width: 50,
+            height: 50,
+            color: Colors.grey[300],
+            child: const Icon(Icons.broken_image),
+          ),
+        )
+      : Container(
+          width: 50,
+          height: 50,
+          color: Colors.grey[300],
+          child: const Icon(Icons.image_not_supported),
+        ),
+),
+
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
