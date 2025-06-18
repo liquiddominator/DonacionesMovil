@@ -18,10 +18,16 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  // Inicializar Supabase
+  await Supabase.initialize(
+    url: 'https://tjuafoiemlxssyyfhden.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqdWFmb2llbWx4c3N5eWZoZGVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxNzY2ODQsImV4cCI6MjA2NTc1MjY4NH0.JyqTwqBrEoNhJ-SOOnIqdhrRoEFD7k39etkV9qQysks',
+  );
   await initializeDateFormatting('es_BO', null);
   runApp(const MyApp());
 }

@@ -1,17 +1,18 @@
+import 'dart:io';
+
 import 'package:donaciones_movil/controllers/auth/auth_controller.dart';
 import 'package:donaciones_movil/controllers/user_controller.dart';
 import 'package:donaciones_movil/models/usuario.dart';
+import 'package:donaciones_movil/services/supabase_storage_service.dart';
 import 'package:donaciones_movil/views/auth/login_page.dart';
 import 'package:donaciones_movil/widgets/navegacion/main_navigation_page.dart';
 import 'package:donaciones_movil/widgets/perfil/dialogo_cerrar_sesion.dart';
 import 'package:donaciones_movil/widgets/perfil/personal_info_card.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 
 class PerfilUsuarioPage extends StatefulWidget {
   const PerfilUsuarioPage({super.key});
@@ -97,49 +98,56 @@ class _PerfilUsuarioPageState extends State<PerfilUsuarioPage> {
   }
 
   Future<void> _seleccionarYSubirImagen() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    final authController = Provider.of<AuthController>(context, listen: false);
-    final userController = Provider.of<UserController>(context, listen: false);
-    final usuarioActual = authController.currentUser!;
+  final picker = ImagePicker();
+  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  final authController = Provider.of<AuthController>(context, listen: false);
+  final userController = Provider.of<UserController>(context, listen: false);
+  final usuarioActual = authController.currentUser!;
 
-    if (pickedFile != null) {
-      setState(() => _isLoading = true);
+  if (pickedFile != null) {
+    setState(() => _isLoading = true);
 
-      try {
-        final fileName = path.basename(pickedFile.path);
-        final storageRef = FirebaseStorage.instance.ref().child('usuarios/$fileName');
-        final uploadTask = await storageRef.putData(await pickedFile.readAsBytes());
-        final downloadUrl = await uploadTask.ref.getDownloadURL();
+    try {
+      final supabaseStorage = SupabaseStorageService();
 
-        final updatedUser = Usuario(
-          usuarioId: usuarioActual.usuarioId,
-          nombre: usuarioActual.nombre,
-          apellido: usuarioActual.apellido,
-          email: usuarioActual.email,
-          contrasena: usuarioActual.contrasena,
-          telefono: usuarioActual.telefono,
-          activo: usuarioActual.activo,
-          fechaRegistro: usuarioActual.fechaRegistro,
-          imagenUrl: downloadUrl,
-        );
+      final publicUrl = await supabaseStorage.uploadFile(
+        file: File(pickedFile.path),
+        storagePath: 'usuarios/usuario_${usuarioActual.usuarioId}.jpg',
+      );
 
-        final success = await userController.updateUsuario(updatedUser);
-        if (success) authController.setCurrentUser(updatedUser);
-
-        setState(() {});
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Imagen actualizada'), backgroundColor: Colors.green),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al subir imagen: $e'), backgroundColor: Colors.red),
-        );
-      } finally {
-        setState(() => _isLoading = false);
+      if (publicUrl == null) {
+        throw Exception('No se pudo obtener la URL pública');
       }
+
+      final updatedUser = Usuario(
+        usuarioId: usuarioActual.usuarioId,
+        nombre: usuarioActual.nombre,
+        apellido: usuarioActual.apellido,
+        email: usuarioActual.email,
+        contrasena: usuarioActual.contrasena,
+        telefono: usuarioActual.telefono,
+        activo: usuarioActual.activo,
+        fechaRegistro: usuarioActual.fechaRegistro,
+        imagenUrl: publicUrl,
+      );
+
+      final success = await userController.updateUsuario(updatedUser);
+      if (success) authController.setCurrentUser(updatedUser);
+
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Imagen actualizada'), backgroundColor: Colors.green),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al subir imagen: $e'), backgroundColor: Colors.red),
+      );
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
+}
+
 
   void _mostrarOpcionesImagen() {
     showModalBottomSheet(

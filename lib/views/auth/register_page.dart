@@ -179,7 +179,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                             activo: true,
                                             fechaRegistro: DateTime.now(),
                                             imagenUrl:
-                                                'https://firebasestorage.googleapis.com/v0/b/transparenciadonaciones.firebasestorage.app/o/user_default.jpg?alt=media&token=5a749ef3-8eae-495e-b5b5-07d59b0d0006',
+                                                'https://tjuafoiemlxssyyfhden.supabase.co/storage/v1/object/public/transparencia-bucket//user_default.jpg',
                                           );
                                           final success = await authController.register(
                                               newUsuario, _selectedRolId!);
