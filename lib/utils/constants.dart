@@ -1,6 +1,6 @@
 class ApiConstants {
-  static const baseUrl = 'http://10.0.2.2:5097'; // SQL
-  static const mongoBaseUrl = 'http://10.0.2.2:5126'; // MongoDB
+  static const baseUrl = 'http://apidonacionesbeni.somee.com'; // SQL
+  static const mongoBaseUrl = 'http://www.apimongo.somee.com'; // MongoDB
 
   static const apiUrl = '$baseUrl/api';
   static const mongoApiUrl = '$mongoBaseUrl/api';
