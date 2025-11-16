@@ -171,6 +171,7 @@ class ConfirmarDonacionPage extends StatelessWidget {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
+                              key: const Key('btnConfirmarDonacion'),
                               onPressed: () => _confirmarDonacion(context),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFF58C5B),

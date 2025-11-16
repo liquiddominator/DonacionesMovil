@@ -188,14 +188,14 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(5, (i) {
                             return IconButton(
+                              key: Key('star${i + 1}'),
                               onPressed: () {
                                 setState(() => _rating = i + 1);
                               },
                               icon: Icon(
                                 Icons.star,
                                 size: 32,
-                                color:
-                                    i < _rating ? Colors.amber : Colors.grey[300],
+                                color: i < _rating ? Colors.amber : Colors.grey[300],
                               ),
                             );
                           }),
@@ -213,6 +213,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: TextField(
+                          key: const Key('txtComentarioFeedback'),
                           controller: _comentarioController,
                           maxLines: 4,
                           maxLength: 500,
@@ -227,23 +228,23 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                         ),
                       ),
                       ValueListenableBuilder<TextEditingValue>(
-  valueListenable: _comentarioController,
-  builder: (context, value, _) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Text(
-        '${value.text.length}/500 caracteres',
-        style: const TextStyle(fontSize: 12, color: Colors.grey),
-      ),
-    );
-  },
-),
-
+                        valueListenable: _comentarioController,
+                        builder: (context, value, _) {
+                          return Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              '${value.text.length}/500 caracteres',
+                              style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                          );
+                        },
+                      ),
                       const SizedBox(height: 20),
                       Row(
                         children: [
                           Expanded(
                             child: OutlinedButton(
+                              key: const Key('btnCancelarFeedback'),
                               onPressed: _isSubmitting
                                   ? null
                                   : () => Navigator.pop(context),
@@ -262,6 +263,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: ElevatedButton(
+                              key: const Key('btnEnviarFeedback'),
                               onPressed: _isSubmitting || _rating == 0
                                   ? null
                                   : () async {

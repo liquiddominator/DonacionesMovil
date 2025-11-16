@@ -337,6 +337,7 @@ const SizedBox(height: 24),
           left: 16,
           right: 16,
           child: GestureDetector(
+            key: const Key('btnDonarAhora'),
             onTap: () {
               Navigator.push(
                 context,

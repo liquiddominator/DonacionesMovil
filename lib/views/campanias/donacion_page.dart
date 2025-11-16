@@ -80,19 +80,19 @@ class _DonacionPageState extends State<DonacionPage> {
             child: Form(
               key: _formKey,
               child: ListView(
+                key: const Key('scrollDonacion'),
                 padding: const EdgeInsets.only(top: 230, bottom: 20), // espacio para el card superpuesto
                 children: [
                   TipoDonacionSelector(
                     tipoSeleccionado: _tipoDonacion,
                     onChangedTipo: (nuevoTipo) {
-  setState(() {
-    _tipoDonacion = nuevoTipo;
-    if (nuevoTipo == 'Monetaria') {
-      _descripcionController.clear(); // limpiamos el campo
-    }
-  });
-},
-
+                      setState(() {
+                        _tipoDonacion = nuevoTipo;
+                        if (nuevoTipo == 'Monetaria') {
+                          _descripcionController.clear(); // limpiamos el campo
+                        }
+                      });
+                    },
                     montoSeleccionado: double.tryParse(_montoController.text),
                     onMontoChanged: (monto) {
                       setState(() {
@@ -200,6 +200,7 @@ Widget _buildBotonContinuar(usuario) {
     width: double.infinity,
     height: 50,
     child: ElevatedButton(
+      key: const Key('btnContinuarDonacion'),
       onPressed: () {
         if (_formKey.currentState!.validate()) {
           final donacion = Donacion(

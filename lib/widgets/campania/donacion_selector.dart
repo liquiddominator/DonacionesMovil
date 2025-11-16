@@ -111,6 +111,7 @@ class TipoDonacionSelector extends StatelessWidget {
               ),
             ),
             child: TextFormField(
+              key: const Key('txtMontoDonacion'),
               controller: montoController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
@@ -147,6 +148,7 @@ class TipoDonacionSelector extends StatelessWidget {
               ),
             ),
             child: TextFormField(
+              key: const Key('txtDescripcionDonacion'),
               controller: descripcionController,
               maxLines: 3,
               decoration: const InputDecoration(

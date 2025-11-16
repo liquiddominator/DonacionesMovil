@@ -115,6 +115,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      key: const Key('splashScreen'),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(

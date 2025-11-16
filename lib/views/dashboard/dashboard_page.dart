@@ -2,8 +2,6 @@ import 'package:donaciones_movil/controllers/campania_controller.dart';
 import 'package:donaciones_movil/controllers/donacion_controller.dart';
 import 'package:donaciones_movil/controllers/saldos_donacion_controller.dart';
 import 'package:donaciones_movil/models/donacion.dart';
-import 'package:donaciones_movil/views/auth/login_page.dart';
-import 'package:donaciones_movil/views/perfil/perfil_usuario_page.dart';
 import 'package:donaciones_movil/widgets/dashboard/build_campanias_lista.dart';
 import 'package:donaciones_movil/controllers/asignacion_controller.dart';
 import 'package:donaciones_movil/widgets/dashboard/build_sumary_card.dart';
@@ -98,6 +96,7 @@ class _DashboardPageState extends State<DashboardPage> {
     final nombre = usuario.nombre;
 
     return Scaffold(
+      key: const Key('dashboardPage'),
       backgroundColor: const Color(0xFFFFF8F4),
       body: RefreshIndicator(
         color: const Color(0xFFF58C5B),
@@ -120,29 +119,27 @@ class _DashboardPageState extends State<DashboardPage> {
                     bottomRight: Radius.circular(36),
                   ),
                   child: Container(
-  decoration: const BoxDecoration(
-    color: Color(0xFFF58C5B),
-    borderRadius: BorderRadius.only(
-      bottomLeft: Radius.circular(36),
-      bottomRight: Radius.circular(36),
-    ),
-  ),
-  child: Stack(
-    children: [
-      Positioned(
-  left: 300, // ligeramente a la derecha del texto
-  bottom: 25, // nivelado con el texto “¡Hola!”
-  child: Opacity(
-    opacity: 0.70, // Marca de agua sutil
-    child: Image.asset(
-      'assets/dashboard.png',
-      width: 90,  // tamaño pequeño y contenido
-      fit: BoxFit.contain,
-    ),
-  ),
-),
-
-
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF58C5B),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(36),
+                        bottomRight: Radius.circular(36),
+                      ),
+                    ),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          left: 300, // ligeramente a la derecha del texto
+                          bottom: 25, // nivelado con el texto “¡Hola!”
+                          child: Opacity(
+                            opacity: 0.70, // Marca de agua sutil
+                            child: Image.asset(
+                              'assets/dashboard.png',
+                              width: 90,  // tamaño pequeño y contenido
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
                         Positioned(
                           left: 25,
                           top: 45,
@@ -234,35 +231,32 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
 
             SliverToBoxAdapter(
-  child: Container(
-    decoration: const BoxDecoration(
-      color: Color(0xFFFFF8F4),
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(24),
-        topRight: Radius.circular(24),
-      ),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20), // <-- aquí ajustas la separación
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          buildSummaryCards(context),
-          const SizedBox(height: 32),
-          _buildCampaniasDestacadasSection(context),
-        ],
-      ),
-    ),
-  ),
-),
-
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFF8F4),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 20), // <-- aquí ajustas la separación
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      buildSummaryCards(context),
+                      const SizedBox(height: 32),
+                      _buildCampaniasDestacadasSection(context),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
-
-  
 
   Widget _buildCampaniasDestacadasSection(BuildContext context) {
     return Column(
@@ -287,6 +281,7 @@ class _DashboardPageState extends State<DashboardPage> {
             const SizedBox(width: 12),
             const Text(
               'Campañas Destacadas',
+              key: Key('lblCampaniasDestacadas'), // <-- KEY DEL TEXTO
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,

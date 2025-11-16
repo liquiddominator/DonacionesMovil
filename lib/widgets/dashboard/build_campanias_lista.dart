@@ -65,6 +65,7 @@ Widget buildCampaniasLista(
   final top4 = destacadas.take(4).toList();
  
   return GridView.builder(
+    key: const Key('gridCampaniasDestacadas'),
     physics: const NeverScrollableScrollPhysics(), // Evita scroll interno
     shrinkWrap: true,
     padding: const EdgeInsets.only(top: 8),

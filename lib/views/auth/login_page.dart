@@ -43,37 +43,32 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Barra superior decorativa
                 Align(
-  alignment: Alignment.topCenter,
-  child: Container(
-    height: 4,
-    width: 340, // ancho reducido
-    decoration: const BoxDecoration(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(12),
-        topRight: Radius.circular(12),
-      ),
-      gradient: LinearGradient(
-        colors: [Color(0xFFF58C5B), Color(0xFFA5D6A7)],
-      ),
-    ),
-  ),
-),
+                  alignment: Alignment.topCenter,
+                  child: Container(
+                    height: 4,
+                    width: 340,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
+                      gradient: LinearGradient(
+                        colors: [Color(0xFFF58C5B), Color(0xFFA5D6A7)],
+                      ),
+                    ),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   child: Column(
                     children: [
-                      // Logo circular
                       Image.asset(
-  'assets/logo.png',
-  width: 120,
-  height: 120,
-),
-
+                        'assets/logo.png',
+                        width: 120,
+                        height: 120,
+                      ),
                       const SizedBox(height: 16),
-
-                      // Título
                       const Text(
                         'TraceGive',
                         style: TextStyle(
@@ -91,8 +86,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-
-                      // Bienvenida
                       const Text(
                         '¡Bienvenido de vuelta!',
                         style: TextStyle(
@@ -118,102 +111,126 @@ class _LoginPageState extends State<LoginPage> {
                           children: [
                             // Email
                             Align(
-  alignment: Alignment.centerLeft,
-  child: Text(
-    'Correo electrónico',
-    style: TextStyle(
-      fontWeight: FontWeight.w600,
-      color: Color(0xFF2F2F2F),
-      fontSize: 14,
-    ),
-  ),
-),
-const SizedBox(height: 6),
-TextFormField(
-  controller: _emailController,
-  style: const TextStyle(color: Color(0xFF787878)),
-  decoration: InputDecoration(
-    hintText: 'tu@email.com',
-    hintStyle: const TextStyle(color: Color.fromARGB(255, 144, 144, 144)),
-    filled: true,
-    fillColor: Color.fromARGB(255, 255, 245, 241),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: const BorderSide(color: Color(0xFFFFD1A8)),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: const BorderSide(color: Color(0xFFFFD1A8)),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: const BorderSide(color: Color(0xFFF58C5B), width: 2),
-    ),
-    contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-  ),
-  validator: (value) {
-    if (value == null || value.isEmpty) return 'Campo requerido';
-    return null;
-  },
-),
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Correo electrónico',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF2F2F2F),
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            TextFormField(
+                              key: const Key('txtEmailLogin'), // <-- KEY PARA PRUEBAS
+                              controller: _emailController,
+                              style: const TextStyle(color: Color(0xFF787878)),
+                              decoration: InputDecoration(
+                                hintText: 'tu@email.com',
+                                hintStyle: const TextStyle(
+                                  color: Color.fromARGB(255, 144, 144, 144),
+                                ),
+                                filled: true,
+                                fillColor: const Color.fromARGB(255, 255, 245, 241),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(color: Color(0xFFFFD1A8)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(color: Color(0xFFFFD1A8)),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFF58C5B),
+                                    width: 2,
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                  horizontal: 16,
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) return 'Campo requerido';
+                                return null;
+                              },
+                            ),
                             const SizedBox(height: 16),
 
+                            // Contraseña
                             Align(
-  alignment: Alignment.centerLeft,
-  child: Text(
-    'Contraseña',
-    style: TextStyle(
-      fontWeight: FontWeight.w600,
-      color: Color(0xFF2F2F2F),
-      fontSize: 14,
-    ),
-  ),
-),
-const SizedBox(height: 6),
-TextFormField(
-  controller: _passwordController,
-  obscureText: _obscurePassword,
-  style: const TextStyle(color: Color(0xFF787878)),
-  decoration: InputDecoration(
-    hintText: 'Tu contraseña',
-    hintStyle: const TextStyle(color: Color.fromARGB(255, 144, 144, 144)),
-    filled: true,
-    fillColor: Color.fromARGB(255, 255, 245, 241),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: const BorderSide(color: Color(0xFFFFD1A8)),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: const BorderSide(color: Color(0xFFFFD1A8)),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: const BorderSide(color: Color(0xFFF58C5B), width: 2),
-    ),
-    contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-    suffixIcon: IconButton(
-      icon: Icon(
-        _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-        color: Color(0xFF787878),
-      ),
-      onPressed: () {
-        setState(() => _obscurePassword = !_obscurePassword);
-      },
-    ),
-  ),
-  validator: (value) {
-    if (value == null || value.isEmpty) return 'Campo requerido';
-    return null;
-  },
-),
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Contraseña',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF2F2F2F),
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            TextFormField(
+                              key: const Key('txtPasswordLogin'), // <-- KEY PARA PRUEBAS
+                              controller: _passwordController,
+                              obscureText: _obscurePassword,
+                              style: const TextStyle(color: Color(0xFF787878)),
+                              decoration: InputDecoration(
+                                hintText: 'Tu contraseña',
+                                hintStyle: const TextStyle(
+                                  color: Color.fromARGB(255, 144, 144, 144),
+                                ),
+                                filled: true,
+                                fillColor: const Color.fromARGB(255, 255, 245, 241),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(color: Color(0xFFFFD1A8)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(color: Color(0xFFFFD1A8)),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFF58C5B),
+                                    width: 2,
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                  horizontal: 16,
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                    color: const Color(0xFF787878),
+                                  ),
+                                  onPressed: () {
+                                    setState(() => _obscurePassword = !_obscurePassword);
+                                  },
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) return 'Campo requerido';
+                                return null;
+                              },
+                            ),
+
                             // Olvidé contraseña
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Función en desarrollo')),
+                                    const SnackBar(
+                                      content: Text('Función en desarrollo'),
+                                    ),
                                   );
                                 },
                                 child: const Text(
@@ -231,6 +248,7 @@ TextFormField(
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
+                                key: const Key('btnLogin'), // <-- KEY PARA PRUEBAS
                                 onPressed: authController.isLoading
                                     ? null
                                     : () async {
@@ -242,7 +260,10 @@ TextFormField(
                                           if (ok && context.mounted) {
                                             Navigator.pushReplacement(
                                               context,
-                                              MaterialPageRoute(builder: (_) => const MainNavigationPage()),
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    const MainNavigationPage(),
+                                              ),
                                             );
                                           }
                                         }
@@ -259,11 +280,17 @@ TextFormField(
                                     ? const SizedBox(
                                         width: 20,
                                         height: 20,
-                                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
                                       )
                                     : const Text(
                                         'Iniciar Sesión',
-                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                               ),
                             ),
@@ -277,7 +304,10 @@ TextFormField(
                                   padding: EdgeInsets.symmetric(horizontal: 12),
                                   child: Text(
                                     'o continúa con',
-                                    style: TextStyle(fontSize: 13, color: Color(0xFF787878)),
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Color(0xFF787878),
+                                    ),
                                   ),
                                 ),
                                 const Expanded(child: Divider(thickness: 1)),
@@ -285,12 +315,15 @@ TextFormField(
                             ),
                             const SizedBox(height: 16),
 
-                            // Botón de Google
+                            // Botón de Google (sin cambios, no lo usamos en pruebas)
                             SizedBox(
                               width: double.infinity,
                               child: OutlinedButton.icon(
                                 onPressed: () {},
-                                icon: Image.asset('assets/logo_google.png', height: 20),
+                                icon: Image.asset(
+                                  'assets/logo_google.png',
+                                  height: 20,
+                                ),
                                 label: const Text(
                                   'Continuar con Google',
                                   style: TextStyle(color: Color(0xFF2F2F2F)),
@@ -298,7 +331,9 @@ TextFormField(
                                 style: OutlinedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(vertical: 12),
                                   side: const BorderSide(color: Colors.black12),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
                               ),
                             ),
@@ -311,12 +346,17 @@ TextFormField(
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text('¿No tienes cuenta?', style: TextStyle(color: Color(0xFF787878))),
+                          const Text(
+                            '¿No tienes cuenta?',
+                            style: TextStyle(color: Color(0xFF787878)),
+                          ),
                           TextButton(
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const RegisterPage()),
+                                MaterialPageRoute(
+                                  builder: (_) => const RegisterPage(),
+                                ),
                               );
                             },
                             child: const Text(

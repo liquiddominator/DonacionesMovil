@@ -21,6 +21,7 @@ Widget buildCampaniaCard(
   final creador = usuariosMap[campania.usuarioIdcreador];
 
   return GestureDetector(
+    key: const Key('campaniaCard'),
     onTap: () {
       Navigator.push(
         context,
